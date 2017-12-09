@@ -29,6 +29,29 @@ Open a non-elevated command prompt, or PowerShell prompt, and type the following
 
 Vindicate will now search for LLMNR/NBNS/mDNS spoofing and report back.
 
+If you see nothing happening, try using the `-v` flag to get more verbose output on what Vindicate is doing.
+
+If there is spoofing going on, you may see something like this:
+
+`Vindicate - Copyright (C) 2017 Danny Moules
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see LICENSE for details.
+
+Received NBNS response from 192.168.1.24 claiming 192.168.1.24
+Received LLMNR response from 192.168.1.24 claiming 192.168.1.24
+Spoofing confidence level adjusted to Medium
+Spoofing confidence level adjusted to Medium
+Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Spoofing confidence level adjusted to Certain
+Detected service on SMB TCP port at 192.168.1.24
+Detected service on SMB TCP port at 192.168.1.24`
+
+This indicates an ongoing attack (in this case, Responder running with defaults).
+
+Use ESC to close the application.
+
 ### Get more info
 
 Use `-v` with VindicateCLI to get more verbose output.
