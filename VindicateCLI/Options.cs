@@ -71,7 +71,7 @@ namespace VindicateCLI
         [Option('a', "addr", DefaultValue = null, Required = false, HelpText = "Preferred IPv4 address to use. Used for determining broadcast address and serves as SMB test source address.")]
         public String PreferredIPv4Address { get; set; }
 
-        [Option('e', "eventlog", DefaultValue = true, Required = false, HelpText = "Logging mode. False for console only. True for console + event log.")]
+        [Option('e', "eventlog", DefaultValue = false, Required = false, HelpText = "Logging mode. False for console only. True for console + event log.")]
         public Boolean Logging { get; set; }
 
         [Option('f', "frequency", DefaultValue = 10000, Required = false, HelpText = "Frequency of name service requests (in milliseconds)")]

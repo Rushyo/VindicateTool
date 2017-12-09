@@ -37,6 +37,8 @@ namespace VindicateService
         }
 
         //New-EventLog -Source "VindicateService" -LogName "Vindicate"
+        //sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="D:\src\VindicateTool\VindicateService\bin\Debug\VindicateService.exe" obj="NT Authority\NetworkService"
+        //sc.exe start "VindicateService"
         protected override void OnStart(String[] args)
         {
             var logger = new Logger(LogMode.EventLog, Assembly.GetExecutingAssembly().GetName().Name, false);
