@@ -75,8 +75,8 @@ Event logs are stored under `Applications and Services Log\Vindicate`.
 Run from an elevated PowerShell prompt (changing FULL\PATH\TO\ and ARGSHERE as appropriate):
 
 ```powershell
-New-EventLog -Source "VindicateService" -LogName "Vindicate"`
-sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="FULL\PATH\TO\ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"`
+New-EventLog -Source "VindicateService" -LogName "Vindicate"
+sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="FULL\PATH\TO\ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"
 sc.exe start "VindicateService" "ARGSHERE"
 ```
 
