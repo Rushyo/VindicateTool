@@ -66,7 +66,7 @@ Open an elevated (Administrator) PowerShell prompt and type the following:
 New-EventLog -Source "VindicateCLI" -LogName "Vindicate"
 ```
 
-Run the CLI app with `-e` to enable the event log. The service uses the Windows Event Log (or Mono equivalent) automatically.
+Run the CLI app with `-e` to enable event logging. The service uses the Windows Event Log (or Mono equivalent) automatically.
 
 Event logs are stored under `Applications and Services Log\Vindicate`.
 
