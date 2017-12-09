@@ -33,20 +33,16 @@ If you see nothing happening, try using the `-v` flag to get more verbose output
 
 If there is spoofing going on, you may see something like this:
 
-`Vindicate - Copyright (C) 2017 Danny Moules
-This program comes with ABSOLUTELY NO WARRANTY.
-This is free software, and you are welcome to redistribute it
-under certain conditions; see LICENSE for details.
-
+```
 Received NBNS response from 192.168.1.24 claiming 192.168.1.24
 Received LLMNR response from 192.168.1.24 claiming 192.168.1.24
-Spoofing confidence level adjusted to Medium
 Spoofing confidence level adjusted to Medium
 Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
 Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
 Spoofing confidence level adjusted to Certain
 Detected service on SMB TCP port at 192.168.1.24
-Detected service on SMB TCP port at 192.168.1.24`
+Detected service on SMB TCP port at 192.168.1.24
+```
 
 This indicates an ongoing attack (in this case, Responder running with defaults).
 
@@ -74,11 +70,11 @@ Event logs are stored under `Applications and Services Log\Vindicate`.
 
 Run from an elevated PowerShell prompt (changing FULL\PATH\TO\ and ARGSHERE as appropriate):
 
-`New-EventLog -Source "VindicateService" -LogName "Vindicate"`
-
-`sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="`FULL\PATH\TO\\`ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"`
-
-`sc.exe start "VindicateService" "`ARGSHERE`"`
+```powershell
+New-EventLog -Source "VindicateService" -LogName "Vindicate"`
+sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="FULL\PATH\TO\\ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"`
+sc.exe start "VindicateService" "ARGSHERE"
+```
 
 The service supports all flags the CLI app does except `-e` (event logs are always enabled).
 
