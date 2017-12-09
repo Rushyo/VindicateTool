@@ -13,7 +13,7 @@ Vindicate is a tool which detects name service spoofing, often used by IT networ
 
 ### Build prerequisites
 
-Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Binaries are available under ReleaseBinaries.
+Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-compiled binaries are available under ReleaseBinaries.
 
 ### Licensing
 
