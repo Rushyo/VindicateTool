@@ -1,2 +1,2 @@
-# VindicateTool
-LLMNR/NBNS/mDNS Spoofing Detection Toolkit
+# Vindicate
+An LLMNR/NBNS/mDNS Spoofing Detection Toolkit
