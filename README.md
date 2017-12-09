@@ -3,7 +3,7 @@ An LLMNR/NBNS/mDNS Spoofing Detection Toolkit for network administrators
 
 ## What is Vindicate?
 
-Vindicate is a tool which detects name service spoofing, often used by IT network attackers to steal credentials from users. It's designed to detect the use of hacking tools such as [Responder](https://github.com/SpiderLabs/Responder), [Inveigh](https://github.com/Kevin-Robertson/Inveigh), [NBNSpoof](https://en.kali.tools/all/?tool=881&PageSpeed=noscript), and [Metasploit's LLMNR spoofer](https://www.rapid7.com/db/modules/auxiliary/spoof/llmnr/llmnr_response) whilst avoiding false positives. This can allow a Blue Team to quickly detect and isolate attackers on their network. It takes advantage of the Windows event log to quickly integrate with an Active Directory network, or its output can be piped to a log for other systems.
+Vindicate is a tool which detects name service spoofing, often used by IT network attackers to steal credentials (e.g. Windows Active Directory passwords) from users. It's designed to detect the use of hacking tools such as [Responder](https://github.com/SpiderLabs/Responder), [Inveigh](https://github.com/Kevin-Robertson/Inveigh), [NBNSpoof](https://en.kali.tools/all/?tool=881&PageSpeed=noscript), and [Metasploit's LLMNR spoofer](https://www.rapid7.com/db/modules/auxiliary/spoof/llmnr/llmnr_response) whilst avoiding false positives. This can allow a Blue Team to quickly detect and isolate attackers on their network. It takes advantage of the Windows event log to quickly integrate with an Active Directory network, or its output can be piped to a log for other systems.
 
 ### What is LLMNR/NBNS/mDNS spoofing and why do I need to detect it?
 
