@@ -279,6 +279,8 @@ namespace VindicateLib
                     String nameString = Encoding.ASCII.GetString(nameData);
                     if (protocol == Protocol.NBNS)
                         nameString = DecodeNetBiosName(nameString);
+                    if (protocol == Protocol.mDNS)
+                        nameLength += 6; //Skip .local
                     Byte[] typeBytes = bytesRemaining.Skip(1 + nameLength + 1).Take(2).ToArray();
                     Byte[] classBytes = bytesRemaining.Skip(3 + nameLength + 1).Take(2).ToArray();
                     Byte[] ttlBytes = bytesRemaining.Skip(5 + nameLength + 1).Take(4).ToArray();

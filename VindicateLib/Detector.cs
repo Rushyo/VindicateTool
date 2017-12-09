@@ -276,43 +276,51 @@ namespace VindicateLib
         {
             if (_settings.UseLLMNR)
             {
-                _llmnrClient = LoadUDPClient("LLMNR", _settings.LLMNRPort);
+                _llmnrClient = LoadUDPClient(Protocol.LLMNR, _settings.LLMNRPort);
                 if (_llmnrClient == null)
                     _settings.UseLLMNR = false;
             }
             if (_settings.UseNBNS)
             {
-                _nbnsClient = LoadUDPClient("NBNS", _settings.NBNSPort);
+                _nbnsClient = LoadUDPClient(Protocol.NBNS, _settings.NBNSPort);
                 if (_nbnsClient == null)
                     _settings.UseNBNS = false;
             }
             if (_settings.UsemDNS)
             {
-                _mdnsClient = LoadUDPClient("mDNS", _settings.mDNSPort);
+                _mdnsClient = LoadUDPClient(Protocol.mDNS, _settings.mDNSPort);
                 if (_mdnsClient == null)
                     _settings.UsemDNS = false;
             }
         }
 
-        private UdpClient LoadUDPClient(String serviceName, Int32 port)
+        private UdpClient LoadUDPClient(Protocol protocol, Int32 port)
         {
             UdpClient client = null;
             try
             {
                 client = new UdpClient(port)
                 {
-                    Client = {ReceiveTimeout = 0},
+                    Client =
+                    {
+                        ReceiveTimeout = 0,
+                    },
                     DontFragment = true,
                     EnableBroadcast = true,
                     MulticastLoopback = false
                 };
+
+                if(protocol == Protocol.mDNS)
+                    client.JoinMulticastGroup(IPAddress.Parse("224.0.0.251"));
+
                 if (_settings.Verbose)
-                    _logger.LogMessage(String.Format("Loaded {0} client on port {1}", serviceName, port), EventLogEntryType.Information, (Int32)LogEvents.LoadedUdpClient, (Int16)LogCategories.LoadingInfo);
+                    _logger.LogMessage(String.Format("Loaded {0} service on port {1}", protocol, port), EventLogEntryType.Information, (Int32)LogEvents.LoadedUdpClient, (Int16)LogCategories.LoadingInfo);
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
-                _logger.LogMessage(String.Format("Unable to load {0}. Disabling. Port {1} in use or insufficient privileges?", serviceName, port), EventLogEntryType.Error
+                _logger.LogMessage(String.Format("Unable to load {0} service ({2}). Disabling. Port {1} in use or insufficient privileges?", protocol, port, ex.Message), EventLogEntryType.Error
                     , (Int32)LogEvents.UnableToLoadUdpClient, (Int16)LogCategories.NonFatalError);
+                return null;
             }
 
             return client;

@@ -44,7 +44,7 @@ namespace VindicateService
         [Option("nbns-lookup", DefaultValue = "wpad-proxy", Required = false, HelpText = "NBNS lookup target name.")]
         public String NBNSTarget { get; set; }
 
-        [Option('m', "mdns", DefaultValue = false, Required = false,
+        [Option('m', "mdns", DefaultValue = true, Required = false,
             HelpText = "Whether to enable mDNS requests. Service is fixed to UDP port 5353. Conflicts with DNS client on Windows.")]
         public Boolean UsemDNS { get; set; }
 

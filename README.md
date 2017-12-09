@@ -36,12 +36,15 @@ If you see nothing happening, try using the `-v` flag to get more verbose output
 If there is spoofing going on, you may see something like this:
 
 ```
-Received NBNS response from 192.168.1.24 claiming 192.168.1.24
-Received LLMNR response from 192.168.1.24 claiming 192.168.1.24
+Received mDNS response from 192.168.1.24 claiming 192.168.1.24
 Spoofing confidence level adjusted to Medium
-Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Received LLMNR response from 192.168.1.24 claiming 192.168.1.24
+Received NBNS response from 192.168.1.24 claiming 192.168.1.24
 Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
 Spoofing confidence level adjusted to Certain
+Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Detected service on SMB TCP port at 192.168.1.24
 Detected service on SMB TCP port at 192.168.1.24
 Detected service on SMB TCP port at 192.168.1.24
 ```
@@ -92,10 +95,10 @@ The service supports all flags the CLI app does except `-e` (event logs are alwa
 
 ### Notes
 
-* As Vindicate uses a custom name service stack written in .NET, it works even if LLMNR and NETBIOS are disabled on the client. Since any responsible network administrator should be trying to remove these anyway, this means you can detect an attack you'd otherwise be immune to. Double win!
+* As Vindicate uses a custom name service stack written in .NET, it works even if multicast resolution is disabled on the client. Since any responsible network administrator should be trying to remove these anyway, this means you can detect an attack you'd otherwise be immune to. Double win!
+* Vindicate can detect mDNS spoofing (often associated with Mac OS), but this detection won't work on Windows if multicast resolution is enabled as a required port is in use by the operating system.
 * Vindicate does not require administrative permissions to run and is sad if you run it with high privileges.
 * Vindicate can send false credentials to an attacker to frustrate their movements. Check out the `-u`, `-p`, and `-d` flags.
 * By default, Vindicate uses lookup names that shouldn't exist in any network but look semi-realistic to an attacker who might be watching, to avoid false positives where you have real services that might rely on these name lookups.
 * Due to the above, Vindicate works best with custom flags that are tuned to your environment. Use `-h` to get help.
-* Vindicate can detect mDNS spoofing (often associated with Mac OS), but by default this detection won't work on Windows as a required port is in use by the operating system.
 * Vindicate has been written with cross-platform use in mind, but has not been tested for this purpose yet.

@@ -44,8 +44,8 @@ namespace VindicateCLI
         [Option("nbns-lookup", DefaultValue = "wpad-proxy", Required = false, HelpText = "NBNS lookup target name.")]
         public String NBNSTarget { get; set; }
 
-        [Option('m', "mdns", DefaultValue = false, Required = false,
-            HelpText = "Whether to enable mDNS requests. Service is fixed to UDP port 5353. Conflicts with DNS client on Windows.")]
+        [Option('m', "mdns", DefaultValue = true, Required = false,
+            HelpText = "Whether to enable mDNS requests. Service is fixed to UDP port 5353. Conflicts with DNS client on Windows if multicast name resolution is enabled.")]
         public Boolean UsemDNS { get; set; }
 
         [Option("mdns-lookup", DefaultValue = "apple-tv", Required = false, HelpText = "mDNS lookup target name (.local will be added automatically).")]
