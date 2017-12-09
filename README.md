@@ -25,7 +25,9 @@ Download VindicateTool.
 
 Open a non-elevated command prompt, or PowerShell prompt, and type the following in the `ReleaseBinaries` sub-folder:
 
-`./VindicateCLI.exe`
+```powershell
+./VindicateCLI.exe
+```
 
 Vindicate will now search for LLMNR/NBNS/mDNS spoofing and report back.
 
@@ -60,7 +62,9 @@ Vindicate will try to auto-detect your IP address. If you have multiple network 
 
 Open an elevated (Administrator) PowerShell prompt and type the following:
 
-`New-EventLog -Source "VindicateCLI" -LogName "Vindicate"`
+```powershell
+New-EventLog -Source "VindicateCLI" -LogName "Vindicate"
+```
 
 Run the CLI app with `-e` to enable the event log. The service uses the Windows Event Log (or Mono equivalent) automatically.
 
@@ -72,7 +76,7 @@ Run from an elevated PowerShell prompt (changing FULL\PATH\TO\ and ARGSHERE as a
 
 ```powershell
 New-EventLog -Source "VindicateService" -LogName "Vindicate"`
-sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="FULL\PATH\TO\\ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"`
+sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="FULL\PATH\TO\ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"`
 sc.exe start "VindicateService" "ARGSHERE"
 ```
 
