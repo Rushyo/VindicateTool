@@ -13,7 +13,7 @@ Vindicate is a tool which detects name service spoofing, often used by IT networ
 
 ### Build prerequisites
 
-Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build.
+Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Binaries are available under ReleaseBinaries.
 
 ### Licensing
 
@@ -21,7 +21,9 @@ Vindicate is copyright Danny 'Rushyo' Moules and provided under a GPLv3 license 
 
 ## Quick Start
 
-Open a non-elevated command prompt, or PowerShell prompt, and type the following in the `VindicateTool\VindicateCLI\bin\Release` folder:
+Download VindicateTool.
+
+Open a non-elevated command prompt, or PowerShell prompt, and type the following in the `ReleaseBinaries` sub-folder:
 
 `./VindicateCLI.exe`
 
@@ -29,7 +31,7 @@ Vindicate will now search for LLMNR/NBNS/mDNS spoofing and report back.
 
 ### Get more info
 
-Use `-v` to get more verbose output.
+Use `-v` with VindicateCLI to get more verbose output.
 
 ### Setting the right IP address
 
@@ -41,17 +43,19 @@ Open an elevated (Administrator) PowerShell prompt and type the following:
 
 `New-EventLog -Source "VindicateCLI" -LogName "Vindicate"`
 
-Run the CLI app with `-e` to enable the event log. The service uses the Windows event log (or Mono equivalent) automatically.
+Run the CLI app with `-e` to enable the event log. The service uses the Windows Event Log (or Mono equivalent) automatically.
 
 Event logs are stored under `Applications and Services Log\Vindicate`.
 
 ## Service Installation
 
-Run from an elevated PowerShell prompt (changing PATH\TO\ and ARGSHERE as appropriate):
+Run from an elevated PowerShell prompt (changing FULL\PATH\TO\ and ARGSHERE as appropriate):
 
 `New-EventLog -Source "VindicateService" -LogName "Vindicate"`
-`sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="`PATH\TO\\`VindicateService.exe" obj="NT Authority\NetworkService"`
+`sc.exe create "VindicateService" DisplayName="Vindicate" start=auto binPath="`FULL\PATH\TO\\`\ReleaseBinaries\VindicateService.exe" obj="NT Authority\NetworkService"`
 `sc.exe start "VindicateService" "`ARGSHERE`"`
+
+The service supports all flags the CLI app does except `-e` (event logs are always enabled).
 
 ## Useful Stuff
 
