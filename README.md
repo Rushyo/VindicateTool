@@ -95,8 +95,8 @@ The service supports all flags the CLI app does except `-e` (event logs are alwa
 
 ### Notes
 
-* As Vindicate uses a custom name service stack written in .NET, it works even if multicast resolution is disabled on the client. Since any responsible network administrator should be trying to remove these anyway, this means you can detect an attack you'd otherwise be immune to. Double win!
-* Vindicate can detect mDNS spoofing (often associated with Mac OS), but this detection won't work on Windows if multicast resolution is enabled as a required port is in use by the operating system.
+* As Vindicate uses a partial custom name service implementation written in .NET, it works even if multicast resolution is disabled on the client.
+* Vindicate can detect mDNS spoofing (often associated with Mac OS), but this detection won't work on Windows if multicast resolution is enabled as a required port is in use by the operating system. Consider [disabling it](http://www.computerstepbystep.com/turn-off-multicast-name-resolution.html) for security reasons anyway (and reset the DNS Service to apply the changes).
 * Vindicate does not require administrative permissions to run and is sad if you run it with high privileges.
 * Vindicate can send false credentials to an attacker to frustrate their movements. Check out the `-u`, `-p`, and `-d` flags.
 * By default, Vindicate uses lookup names that shouldn't exist in any network but look semi-realistic to an attacker who might be watching, to avoid false positives where you have real services that might rely on these name lookups.
