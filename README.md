@@ -11,7 +11,7 @@ Vindicate is a tool which detects name service spoofing, often used by IT networ
 * Aptive Consulting: [LLMNR / NBT-NS Spoofing Attack Network Penetration Testing](https://www.aptive.co.uk/blog/llmnr-nbt-ns-spoofing/)
 * GracefulSecurity: [Stealing Accounts: LLMNR and NBT-NS Spoofing](https://www.gracefulsecurity.com/stealing-accounts-llmnr-and-nbt-ns-poisoning/)
 
-TL;DR - Attackers might be stealing all sorts of credentials on your network (everything from Active Directory credentials to personal email accounts to SQL passwords) from right under your nose and you may be completely unaware it's happening.
+TL;DR - Attackers might be stealing all sorts of credentials on your network (everything from Active Directory credentials to personal email accounts to database passwords) from right under your nose and you may be completely unaware it's happening.
 
 ### Licensing
 
