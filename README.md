@@ -3,7 +3,7 @@ An LLMNR/NBNS/mDNS Spoofing Detection Toolkit for network administrators
 
 ## What is Vindicate?
 
-Vindicate is a tool which detects name service spoofing, often used by IT network attackers to steal credentials from users. It's designed to detect the use of hacking tools such as [Responder](https://github.com/SpiderLabs/Responder), [Inveigh](https://github.com/Kevin-Robertson/Inveigh), [NBNSpoof](https://en.kali.tools/all/?tool=881&PageSpeed=noscript), and [Metasploit's LLMNR spoofer](https://www.rapid7.com/db/modules/auxiliary/spoof/llmnr/llmnr_response) whilst avoiding false positives. This can allow a Blue Team to quickly detect and isolate attackers on their network. It takes advantage of the Windows event log to quickly integrate with an Active Directory network, or its output can be piped to a log for other systems.
+Vindicate is a tool which detects name service spoofing, often used by IT network attackers to steal credentials (e.g. Windows Active Directory passwords) from users. It's designed to detect the use of hacking tools such as [Responder](https://github.com/SpiderLabs/Responder), [Inveigh](https://github.com/Kevin-Robertson/Inveigh), [NBNSpoof](https://en.kali.tools/all/?tool=881&PageSpeed=noscript), and Metasploit's [LLMNR](https://www.rapid7.com/db/modules/auxiliary/spoof/llmnr/llmnr_response), [NBNS](https://www.rapid7.com/db/modules/auxiliary/spoof/nbns/nbns_response), and [mDNS](https://www.rapid7.com/db/modules/auxiliary/spoof/mdns/mdns_response) spoofers, whilst avoiding false positives. This can allow a Blue Team to quickly detect and isolate attackers on their network. It takes advantage of the Windows event log to quickly integrate with an Active Directory network, or its output can be piped to a log for other systems.
 
 ### What is LLMNR/NBNS/mDNS spoofing and why do I need to detect it?
 
@@ -11,9 +11,7 @@ Vindicate is a tool which detects name service spoofing, often used by IT networ
 * Aptive Consulting: [LLMNR / NBT-NS Spoofing Attack Network Penetration Testing](https://www.aptive.co.uk/blog/llmnr-nbt-ns-spoofing/)
 * GracefulSecurity: [Stealing Accounts: LLMNR and NBT-NS Spoofing](https://www.gracefulsecurity.com/stealing-accounts-llmnr-and-nbt-ns-poisoning/)
 
-### Build prerequisites
-
-Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-compiled binaries are available under ReleaseBinaries.
+TL;DR - Attackers might be stealing all sorts of credentials on your network (everything from Active Directory credentials to personal email accounts to database passwords) from right under your nose and you may be completely unaware it's happening.
 
 ### Licensing
 
@@ -87,18 +85,24 @@ The service supports all flags the CLI app does except `-e` (event logs are alwa
 
 ## Useful Stuff
 
+### Build prerequisites
+
+Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-compiled binaries are available under ReleaseBinaries.
+
 ### Important Event IDs
 
-* 7 - This indicates that Vindicate has upgraded its confidence in an assessment that spoofing is going on.
-* 8 - Detected a WPAD (Web Proxy Auto-Detection) service at a spoofed location.
-* 11 - Detected an SMB (Server Message Block) service at a spoofed location.
+* 7 - This indicates that Vindicate has upgraded its confidence in an assessment that spoofing* is going on.
+* 8 - Detected a WPAD (Web Proxy Auto-Detection) service at a spoofed* location.
+* 11 - Detected an SMB (Server Message Block) service at a spoofed* location.
+* 6 - Received a spoofed* response to a name lookup.
 
 ### Notes
 
+* *By default, Vindicate uses lookup names that shouldn't exist in any network but look semi-realistic to an attacker who might be watching, to avoid false positives where you have real services that might rely on these name lookups. If systems with those names really do exist on your network, Vindicate will give false positives.
+* Due to the above, Vindicate works best with custom flags that are tuned to your environment. Use `-h` to get help.
 * As Vindicate uses a partial custom name service implementation written in .NET, it works even if multicast resolution is disabled on the client.
+* Vindicate currently mostly relies on getting a WPAD response, with the SMB detection being very basic (it just checks if an SMB port is in use). If Vindicate is adopted and used I'll write an SMB client to properly verify SMB servers and increase Vindicate's confidence in its detection.
 * Vindicate can detect mDNS spoofing (often associated with Mac OS), but this detection won't work on Windows if multicast resolution is enabled as a required port is in use by the operating system. Consider [disabling it](http://www.computerstepbystep.com/turn-off-multicast-name-resolution.html) for security reasons anyway (and reset the DNS Service to apply the changes).
 * Vindicate does not require administrative permissions to run and is sad if you run it with high privileges.
 * Vindicate can send false credentials to an attacker to frustrate their movements. Check out the `-u`, `-p`, and `-d` flags.
-* By default, Vindicate uses lookup names that shouldn't exist in any network but look semi-realistic to an attacker who might be watching, to avoid false positives where you have real services that might rely on these name lookups.
-* Due to the above, Vindicate works best with custom flags that are tuned to your environment. Use `-h` to get help.
-* Vindicate has been written with cross-platform use in mind, but has not been tested for this purpose yet.
+* Vindicate has been written with cross-platform use in mind, but has not been tested for this purpose yet. If this is desired, let me know with an issue and your platform.
