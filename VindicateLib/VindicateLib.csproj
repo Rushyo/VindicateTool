@@ -49,7 +49,7 @@
     <Compile Include="Enums\LogEvents.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Enums\LogMode.cs" />
-    <Compile Include="NameServiceStack.cs" />
+    <Compile Include="NameServiceClientImpl.cs" />
     <Compile Include="NetworkHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\Protocol.cs" />

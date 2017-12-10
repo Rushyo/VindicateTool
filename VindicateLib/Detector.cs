@@ -29,11 +29,11 @@ using VindicateLib.Enums;
 
 namespace VindicateLib
 {
-    public class Detector
+    public sealed class Detector : IDisposable
     {
         private readonly Logger _logger;
         private readonly DetectorSettings _settings;
-        private readonly NameServiceStack _nameServiceClient;
+        private readonly NameServiceClientImpl _nameServiceClient;
         private ConfidenceLevel _highestConfidenceLevel = ConfidenceLevel.FalsePositive;
         private Random _fastRandom;
         private UdpClient _llmnrClient, _nbnsClient, _mdnsClient;
@@ -82,7 +82,7 @@ namespace VindicateLib
 
             _logger = logger;
             _settings = settings;
-            _nameServiceClient = new NameServiceStack();
+            _nameServiceClient = new NameServiceClientImpl();
 
             InitialiseClients();
             InitialiseBroadcastAddress();
@@ -98,11 +98,11 @@ namespace VindicateLib
                 while (_performSending)
                 {
                     if (_settings.UseLLMNR)
-                        _nameServiceClient.SendNSRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, null);
+                        _nameServiceClient.SendRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, null);
                     if (_settings.UseNBNS)
-                        _nameServiceClient.SendNSRequest(_nbnsClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast);
+                        _nameServiceClient.SendRequest(_nbnsClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast);
                     if (_settings.UsemDNS)
-                        _nameServiceClient.SendNSRequest(_mdnsClient, Protocol.mDNS, _settings.mDNSTarget, null);
+                        _nameServiceClient.SendRequest(_mdnsClient, Protocol.mDNS, _settings.mDNSTarget, null);
 
                     OnMessagesSent();
                     Thread.Sleep(_settings.SendRequestFrequency);
@@ -117,7 +117,7 @@ namespace VindicateLib
                     while (_performListening)
                     {
                         //Valid transaction IDs should be acquired from sent requests, but for now we don't validate so send whatever
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleNSReply(_llmnrClient, Protocol.LLMNR, null));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_llmnrClient, Protocol.LLMNR, null));
                         spinWait.SpinOnce();
                     }
                 });
@@ -130,7 +130,7 @@ namespace VindicateLib
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleNSReply(_nbnsClient, Protocol.NBNS, null));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_nbnsClient, Protocol.NBNS, null));
                         spinWait.SpinOnce();
                     }
                 });
@@ -143,7 +143,7 @@ namespace VindicateLib
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleNSReply(_mdnsClient, Protocol.mDNS, null));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_mdnsClient, Protocol.mDNS, null));
                         spinWait.SpinOnce();
                     }
                 });
@@ -349,6 +349,13 @@ namespace VindicateLib
         private void OnConfidenceLevelChange()
         {
             ConfidenceLevelChange?.Invoke(this, HighestConfidenceLevel);
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable) _llmnrClient)?.Dispose();
+            ((IDisposable) _nbnsClient)?.Dispose();
+            ((IDisposable) _mdnsClient)?.Dispose();
         }
     }
 }

@@ -90,20 +90,23 @@ namespace VindicateCLI
             }
 
             //Create detector
-            var detector = new Detector(logger, settings);
-
-            //Check that all services are still enabled after initialisation
-            if (!detector.IsReady())
+            using (var detector = new Detector(logger, settings))
             {
-                logger.LogMessage("No network services could be created", EventLogEntryType.Error, (Int32)LogEvents.NoValidServices, (Int16)LogCategories.FatalError);
-                return 0x41; //ERROR_NETWORK_ACCESS_DENIED
-            }
 
-            detector.MessagesSent += DetectorMessagesSent;
-            detector.BeginSendingAndListening();
-            while (Console.ReadKey(true).Key != ConsoleKey.Escape)
-                Thread.Yield();
-            detector.EndSendingAndListening();
+                //Check that all services are still enabled after initialisation
+                if (!detector.IsReady())
+                {
+                    logger.LogMessage("No network services could be created", EventLogEntryType.Error,
+                        (Int32) LogEvents.NoValidServices, (Int16) LogCategories.FatalError);
+                    return 0x41; //ERROR_NETWORK_ACCESS_DENIED
+                }
+
+                detector.MessagesSent += DetectorMessagesSent;
+                detector.BeginSendingAndListening();
+                while (Console.ReadKey(true).Key != ConsoleKey.Escape)
+                    Thread.Yield();
+                detector.EndSendingAndListening();
+            }
 
             return 0;
         }

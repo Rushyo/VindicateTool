@@ -50,7 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="WPADServiceCreator.cs" />
+    <Compile Include="WPADServiceFakeHelper.cs" />
     <Compile Include="WPADTesterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

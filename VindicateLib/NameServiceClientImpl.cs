@@ -28,7 +28,7 @@ using VindicateLib.Enums;
 
 namespace VindicateLib
 {
-    internal class NameServiceStack
+    internal class NameServiceClientImpl
     {
         private const Int32 LLMNROutboundPort = 5355;
         private const Int32 NBNSOutboundPort = 137;
@@ -36,7 +36,7 @@ namespace VindicateLib
         private const Int32 mDNSOutboundPort = 5353;
         private readonly Random _random = new Random();
 
-        internal Byte[] SendNSRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress)
+        internal Byte[] SendRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress)
         {
             //Define random transaction ID where relevant
             var transactionId = new Byte[] {0, 0};
@@ -48,7 +48,7 @@ namespace VindicateLib
                 lookupName = EncodeNetBiosName(lookupName, 0x20); //File server service
 
             //Create datagram
-            Byte[] datagram = CreateDatagram(protocol, lookupName, transactionId);
+            Byte[] datagram = CreateRequestDatagram(protocol, lookupName, transactionId);
 
             //Send datagram
             if (protocol == Protocol.LLMNR)
@@ -62,7 +62,7 @@ namespace VindicateLib
             return transactionId;
         }
 
-        internal SpoofDetectionResult ReceiveAndHandleNSReply(UdpClient client, Protocol protocol, Byte[] transactionId)
+        internal SpoofDetectionResult ReceiveAndHandleReply(UdpClient client, Protocol protocol, Byte[] transactionId)
         {
             IPEndPoint sender = null;
             Byte[] replyBuffer;
@@ -91,7 +91,7 @@ namespace VindicateLib
                 };
                 try
                 {
-                    result = HandleNSReply(replyBuffer, sender, transactionId, protocol);
+                    result = HandleReply(replyBuffer, sender, transactionId, protocol);
                 }
                 catch (Exception)
                 {
@@ -104,7 +104,7 @@ namespace VindicateLib
             return null;
         }
 
-        private static Byte[] CreateDatagram(Protocol protocol, String lookupName, Byte[] transactionId)
+        private static Byte[] CreateRequestDatagram(Protocol protocol, String lookupName, Byte[] transactionId)
         {
             var datagram = new List<Byte>();
 
@@ -168,7 +168,7 @@ namespace VindicateLib
 
 
         //Parses a name service response packet received
-        internal SpoofDetectionResult HandleNSReply(Byte[] replyBuffer, IPEndPoint remoteEndpoint, Byte[] senderTransactionId, Protocol protocol)
+        internal static SpoofDetectionResult HandleReply(Byte[] replyBuffer, IPEndPoint remoteEndpoint, Byte[] senderTransactionId, Protocol protocol)
         {
             Byte[] replyTransactionId = replyBuffer.Skip(0).Take(2).ToArray();
             //if(!replyTransactionId.SequenceEqual(senderTransactionId))
@@ -323,7 +323,7 @@ namespace VindicateLib
             return new SpoofDetectionResult() { Detected = false, Endpoint = remoteEndpoint, ErrorMessage = "Execution error, ran past parsing responses", Confidence = ConfidenceLevel.FalsePositive };
         }
 
-        private String EncodeNetBiosName(String lookupName, Byte nameSuffix)
+        private static String EncodeNetBiosName(String lookupName, Byte nameSuffix)
         {
             String uppercaseName = lookupName.ToUpper();
 

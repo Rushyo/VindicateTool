@@ -105,7 +105,7 @@ namespace VindicateService
         protected override void OnStop()
         {
             _detector.EndSendingAndListening();
-            RequestAdditionalTime(2000);
+            RequestAdditionalTime(1000);
         }
     }
 }

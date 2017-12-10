@@ -42,8 +42,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void PerformWPADTest_TotalJunk()
         {
-            var socket = WPADServiceFakeHelper.CreateJunkTcpSocket(ServerAddress, ServerPort);
-            try
+            using (Socket socket = WPADServiceFakeHelper.CreateJunkTcpSocket(ServerAddress, ServerPort))
             {
                 SpoofDetectionResult result =
                     WPADTester.PerformWPADTest(IPAddress.Parse(ServerAddress), ServerPort, "test", "test", "test");
@@ -57,18 +56,12 @@ namespace VindicateLibTests
                 Assert.AreEqual(ServerAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(ServerPort, result.Endpoint.Port);
             }
-            finally
-            {
-                socket.Close(1);
-            }
-
         }
 
         [TestMethod]
         public void PerformWPADTest_ConnectionSinkhole()
         {
-            var socket = WPADServiceFakeHelper.CreateConnectionSinkholeTcpSocket(ServerAddress, ServerPort);
-            try
+            using (Socket socket = WPADServiceFakeHelper.CreateConnectionSinkholeTcpSocket(ServerAddress, ServerPort))
             {
                 SpoofDetectionResult result =
                     WPADTester.PerformWPADTest(IPAddress.Parse(ServerAddress), ServerPort, "test", "test", "test");
@@ -81,17 +74,12 @@ namespace VindicateLibTests
                 Assert.AreEqual(ServerAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(ServerPort, result.Endpoint.Port);
             }
-            finally
-            {
-                socket.Close(1);
-            }
         }
 
         [TestMethod]
         public void PerformWPADTest_ResponseSinkhole()
         {
-            Socket socket = WPADServiceFakeHelper.CreateHTTPSinkholeTcpSocket(ServerAddress, ServerPort);
-            try
+            using (Socket socket = WPADServiceFakeHelper.CreateHTTPSinkholeTcpSocket(ServerAddress, ServerPort))
             {
                 SpoofDetectionResult result =
                     WPADTester.PerformWPADTest(IPAddress.Parse(ServerAddress), ServerPort, "test", "test", "test");
@@ -103,11 +91,6 @@ namespace VindicateLibTests
                 Assert.AreEqual(ServerAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(ServerPort, result.Endpoint.Port);
             }
-            finally
-            {
-                socket.Close(1);
-            }
-
         }
 
         [TestMethod]
