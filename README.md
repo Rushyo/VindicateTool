@@ -89,14 +89,14 @@ The service supports all flags the CLI app does except `-e` (event logs are alwa
 
 ### Important Event IDs
 
-* 7 - This indicates that Vindicate has upgraded its confidence in an assessment that spoofing is going on.
+* 7 - This indicates that Vindicate has upgraded its confidence in an assessment that spoofing* is going on.
 * 8 - Detected a WPAD (Web Proxy Auto-Detection) service at a spoofed* location.
-* 11 - Detected an SMB (Server Message Block) service at a spoofed location.
-* 6 - Received a spoofed response to a name lookup.
+* 11 - Detected an SMB (Server Message Block) service at a spoofed* location.
+* 6 - Received a spoofed* response to a name lookup.
 
 ### Notes
 
-* By default, Vindicate uses lookup names that shouldn't exist in any network but look semi-realistic to an attacker who might be watching, to avoid false positives where you have real services that might rely on these name lookups. If systems with those names really do exist on your network, Vindicate will give false positives.
+* *By default, Vindicate uses lookup names that shouldn't exist in any network but look semi-realistic to an attacker who might be watching, to avoid false positives where you have real services that might rely on these name lookups. If systems with those names really do exist on your network, Vindicate will give false positives.
 * As Vindicate uses a partial custom name service implementation written in .NET, it works even if multicast resolution is disabled on the client.
 * Vindicate can detect mDNS spoofing (often associated with Mac OS), but this detection won't work on Windows if multicast resolution is enabled as a required port is in use by the operating system. Consider [disabling it](http://www.computerstepbystep.com/turn-off-multicast-name-resolution.html) for security reasons anyway (and reset the DNS Service to apply the changes).
 * Vindicate does not require administrative permissions to run and is sad if you run it with high privileges.
