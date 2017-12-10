@@ -5,6 +5,8 @@ An LLMNR/NBNS/mDNS Spoofing Detection Toolkit for network administrators
 
 Vindicate is a tool which detects name service spoofing, often used by IT network attackers to steal credentials (e.g. Windows Active Directory passwords) from users. It's designed to detect the use of hacking tools such as [Responder](https://github.com/SpiderLabs/Responder), [Inveigh](https://github.com/Kevin-Robertson/Inveigh), [NBNSpoof](https://en.kali.tools/all/?tool=881&PageSpeed=noscript), and Metasploit's [LLMNR](https://www.rapid7.com/db/modules/auxiliary/spoof/llmnr/llmnr_response), [NBNS](https://www.rapid7.com/db/modules/auxiliary/spoof/nbns/nbns_response), and [mDNS](https://www.rapid7.com/db/modules/auxiliary/spoof/mdns/mdns_response) spoofers, whilst avoiding false positives. This can allow a Blue Team to quickly detect and isolate attackers on their network. It takes advantage of the Windows event log to quickly integrate with an Active Directory network, or its output can be piped to a log for other systems.
 
+There's a diagram explaining spoofing attacks and how Vindicate works [on the wiki](https://github.com/Rushyo/VindicateTool/wiki/How-it-works).
+
 ### What is LLMNR/NBNS/mDNS spoofing and why do I need to detect it?
 
 * pentest.blog: [What is LLMNR & WPAD and How to Abuse Them During Pentest ?](https://pentest.blog/what-is-llmnr-wpad-and-how-to-abuse-them-during-pentest/)
@@ -95,6 +97,8 @@ Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-com
 * 8 - Detected a WPAD (Web Proxy Auto-Detection) service at a spoofed* location.
 * 11 - Detected an SMB (Server Message Block) service at a spoofed* location.
 * 6 - Received a spoofed* response to a name lookup.
+
+A full list can be found [on the wiki](https://github.com/Rushyo/VindicateTool/wiki/Event-IDs).
 
 ### Notes
 
