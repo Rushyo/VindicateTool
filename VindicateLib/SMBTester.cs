@@ -35,7 +35,7 @@ namespace VindicateLib
                 tcpClient.Connect(result.Endpoint.Address, 139);
                 return new SpoofDetectionResult
                 {
-                    Confidence = ConfidenceLevel.High,
+                    Confidence = ConfidenceLevel.Medium,
                     Detected = true,
                     Endpoint = result.Endpoint,
                     Protocol = Protocol.SMB

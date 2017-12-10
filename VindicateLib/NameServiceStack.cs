@@ -256,7 +256,7 @@ namespace VindicateLib
             Int32 additionalResponses = BitConverter.ToUInt16(replyBuffer.Skip(10).Take(2).Reverse().ToArray(), 0);
             Int32 totalResponses = answerResponses + authorityResponses + additionalResponses;
             if (answerResponses == 0)
-                return new SpoofDetectionResult() { Detected = false, Endpoint = remoteEndpoint, ErrorMessage = "Received reply with no answers", Confidence = ConfidenceLevel.Low };
+                return new SpoofDetectionResult() { Detected = false, Endpoint = remoteEndpoint, ErrorMessage = "Received reply with no answers", Confidence = ConfidenceLevel.FalsePositive };
 
             var queryListBytes = new ArraySegment<Byte>(replyBuffer, 12, replyBuffer.Length - 12);
 
@@ -315,7 +315,7 @@ namespace VindicateLib
                     var dataAddress = new IPAddress(dataBytes);
                     bytesRemaining = bytesRemaining.Skip(11 + nameLength + 1 + dataLength).ToArray();
                     //We only care about the first reply
-                    return new SpoofDetectionResult() { Detected = true, Endpoint = remoteEndpoint, Response = dataAddress.ToString(), Protocol = protocol, Confidence = ConfidenceLevel.Medium };
+                    return new SpoofDetectionResult() { Detected = true, Endpoint = remoteEndpoint, Response = dataAddress.ToString(), Protocol = protocol, Confidence = ConfidenceLevel.Low };
                 }
 
             }
