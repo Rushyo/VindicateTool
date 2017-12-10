@@ -13,10 +13,6 @@ Vindicate is a tool which detects name service spoofing, often used by IT networ
 
 TL;DR - Attackers might be stealing all sorts of credentials on your network (everything from Active Directory credentials to personal email accounts to SQL passwords) from right under your nose and you may be completely unaware it's happening.
 
-### Build prerequisites
-
-Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-compiled binaries are available under ReleaseBinaries.
-
 ### Licensing
 
 Vindicate is copyright Danny 'Rushyo' Moules and provided under a GPLv3 license without warranty. See LICENSE.
@@ -88,6 +84,10 @@ sc.exe start "VindicateService" "ARGSHERE"
 The service supports all flags the CLI app does except `-e` (event logs are always enabled).
 
 ## Useful Stuff
+
+### Build prerequisites
+
+Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-compiled binaries are available under ReleaseBinaries.
 
 ### Important Event IDs
 
