@@ -26,10 +26,15 @@ namespace VindicateLib
 {
     internal static class WPADTester
     {
-        public static SpoofDetectionResult PerformWPADTest(IPAddress targetAddress, String username, String password, String domain)
+        private const Int32 Timeout = 5000;
+
+        public static SpoofDetectionResult PerformWPADTest(IPAddress targetAddress, Int32 targetPort, String username, String password, String domain)
         {
-            var targetEndPoint = new IPEndPoint(targetAddress, 80);
-            var req = (HttpWebRequest)WebRequest.Create("http://" + targetEndPoint.Address + "/wpad.dat");
+            var targetEndPoint = new IPEndPoint(targetAddress, targetPort);
+            var req = (HttpWebRequest)WebRequest.Create(String.Format("http://{0}:{1}/wpad.dat", targetEndPoint.Address, targetEndPoint.Port));
+            req.UnsafeAuthenticatedConnectionSharing = true;
+            req.Timeout = Timeout;
+            req.KeepAlive = false;
             if (!String.IsNullOrEmpty(username))
             {
                 req.AuthenticationLevel = System.Net.Security.AuthenticationLevel.MutualAuthRequested;
@@ -45,70 +50,16 @@ namespace VindicateLib
             {
                 using (var resp = (HttpWebResponse) req.GetResponse())
                 {
-                    if (resp.StatusCode == HttpStatusCode.OK)
-                    {
-                        var isResponder = false;
-                        var isWPAD = false;
-
-                        if (resp.GetResponseStream() != null)
-                        {
-                            using (var reader = new StreamReader(resp.GetResponseStream()))
-                            {
-                                String content = reader.ReadToEnd();
-                                isResponder = content.Contains("RespProxySrv");
-                                isWPAD = content.Contains("PROXY");
-                            }
-                        }
-
-                        return new SpoofDetectionResult()
-                        {
-                            Detected = true,
-                            Endpoint = targetEndPoint,
-                            Response = isResponder ? "Responder WPAD response" : isWPAD ? "WPAD file" : "HTTP Code OK",
-                            Protocol = Protocol.WPAD,
-                            Confidence = isResponder ? ConfidenceLevel.Certain : isWPAD ? ConfidenceLevel.High : ConfidenceLevel.Medium
-
-                        };
-                    }
-
-                    if(resp.StatusCode == HttpStatusCode.Forbidden ||
-                        resp.StatusCode == HttpStatusCode.ProxyAuthenticationRequired ||
-                        resp.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        return new SpoofDetectionResult()
-                        {
-                            Detected = true,
-                            Endpoint = targetEndPoint,
-                            Response = "HTTP Code " + resp.StatusCode,
-                            Protocol = Protocol.WPAD,
-                            Confidence = ConfidenceLevel.Medium
-
-                        };
-                    }
-
-                    return new SpoofDetectionResult()
-                    {
-                        Detected = false,
-                        Endpoint = targetEndPoint,
-                        ErrorMessage = "Unexpected HTTP code " + resp.StatusCode,
-                        Protocol = Protocol.WPAD,
-                        Confidence = ConfidenceLevel.Low
-                    };
+                    return HandleWebResponse(resp, targetEndPoint);
                 }
             }
             catch (WebException ex)
             {
                 if (ex.Status == WebExceptionStatus.ProtocolError)
                 {
-                    return new SpoofDetectionResult
-                    {
-                        Detected = true,
-                        Endpoint = targetEndPoint,
-                        Response = "HTTP Code 401 (Unauthorised)",
-                        Protocol = Protocol.WPAD,
-                        Confidence = ConfidenceLevel.High
-
-                    };
+                    SpoofDetectionResult result = HandleWebResponse((HttpWebResponse)ex.Response, targetEndPoint);
+                    ex.Response.Dispose();
+                    return result;
                 }
                 else
                 {
@@ -133,6 +84,61 @@ namespace VindicateLib
                     Confidence = ConfidenceLevel.FalsePositive
                 };
             }
+        }
+
+        private static SpoofDetectionResult HandleWebResponse(HttpWebResponse resp, IPEndPoint targetEndPoint)
+        {
+            if(resp == null)
+                throw new ArgumentNullException("resp");
+
+            if (resp.StatusCode == HttpStatusCode.OK)
+            {
+                var isResponder = false;
+                var isWPAD = false;
+
+                if (resp.GetResponseStream() != null)
+                {
+                    using (var reader = new StreamReader(resp.GetResponseStream()))
+                    {
+                        reader.BaseStream.ReadTimeout = Timeout;
+                        String content = reader.ReadToEnd();
+                        isResponder = content.Contains("RespProxySrv");
+                        isWPAD = content.Contains("PROXY");
+                    }
+                }
+
+                return new SpoofDetectionResult
+                {
+                    Detected = true,
+                    Endpoint = targetEndPoint,
+                    Response = isResponder ? "Responder WPAD response" : isWPAD ? "WPAD file" : "HTTP Code OK",
+                    Protocol = Protocol.WPAD,
+                    Confidence = isResponder ? ConfidenceLevel.Certain : isWPAD ? ConfidenceLevel.High : ConfidenceLevel.Medium
+                };
+            }
+
+            if (resp.StatusCode == HttpStatusCode.Forbidden ||
+                resp.StatusCode == HttpStatusCode.ProxyAuthenticationRequired ||
+                resp.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return new SpoofDetectionResult()
+                {
+                    Detected = true,
+                    Endpoint = targetEndPoint,
+                    Response = "HTTP Code " + resp.StatusCode,
+                    Protocol = Protocol.WPAD,
+                    Confidence = ConfidenceLevel.Medium
+                };
+            }
+
+            return new SpoofDetectionResult()
+            {
+                Detected = false,
+                Endpoint = targetEndPoint,
+                ErrorMessage = "Unexpected HTTP code " + resp.StatusCode,
+                Protocol = Protocol.WPAD,
+                Confidence = ConfidenceLevel.Low
+            };
         }
     }
 }

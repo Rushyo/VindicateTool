@@ -247,7 +247,7 @@ namespace VindicateLib
 
         private void TestForWPAD(SpoofDetectionResult result)
         {
-            SpoofDetectionResult wpadTestResult = WPADTester.PerformWPADTest(IPAddress.Parse(result.Response), _settings.NTLMUsername,
+            SpoofDetectionResult wpadTestResult = WPADTester.PerformWPADTest(IPAddress.Parse(result.Response), 80, _settings.NTLMUsername,
                 _settings.NTLMPassword, _settings.NTLMDomain);
             if (wpadTestResult.Detected)
             {
