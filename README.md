@@ -40,10 +40,10 @@ Received mDNS response from 192.168.1.24 claiming 192.168.1.24
 Spoofing confidence level adjusted to Medium
 Received LLMNR response from 192.168.1.24 claiming 192.168.1.24
 Received NBNS response from 192.168.1.24 claiming 192.168.1.24
-Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Detected active WPAD service at 192.168.1.24 claiming HTTP Code OK
 Spoofing confidence level adjusted to Certain
-Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
-Detected active WPAD proxy at 192.168.1.24 claiming HTTP Code OK
+Detected active WPAD service at 192.168.1.24 claiming HTTP Code OK
+Detected active WPAD service at 192.168.1.24 claiming HTTP Code OK
 Detected service on SMB TCP port at 192.168.1.24
 Detected service on SMB TCP port at 192.168.1.24
 Detected service on SMB TCP port at 192.168.1.24

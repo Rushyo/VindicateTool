@@ -251,7 +251,7 @@ namespace VindicateLib
                 _settings.NTLMPassword, _settings.NTLMDomain);
             if (wpadTestResult.Detected)
             {
-                _logger.LogMessage(String.Format("Detected active WPAD proxy at {0} claiming {1}",
+                _logger.LogMessage(String.Format("Detected active WPAD service at {0} claiming {1}",
                         wpadTestResult.Endpoint.Address, wpadTestResult.Response)
                     , EventLogEntryType.Warning, (Int32) LogEvents.WPADProxyFound, (Int16) LogCategories.SpoofNotice,
                     null);
