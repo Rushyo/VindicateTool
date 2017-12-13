@@ -7,6 +7,8 @@ Vindicate is a tool which detects name service spoofing, often used by IT networ
 
 There's a diagram explaining spoofing attacks and how Vindicate works [on the wiki](https://github.com/Rushyo/VindicateTool/wiki/How-it-works).
 
+Requires .NET Framework 4.5.2 
+
 ### What is LLMNR/NBNS/mDNS spoofing and why do I need to detect it?
 
 * pentest.blog: [What is LLMNR & WPAD and How to Abuse Them During Pentest ?](https://pentest.blog/what-is-llmnr-wpad-and-how-to-abuse-them-during-pentest/)
@@ -90,6 +92,25 @@ The service supports all flags the CLI app does except `-e` (event logs are alwa
 ### Build prerequisites
 
 Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-compiled binaries are available under ReleaseBinaries.
+
+### Firewall Configuration
+
+Inbound:
+
+UDP Local 49501 <- Remote 5355 (LLMNR)
+UDP Local 49502 <- Remote 137 (NBNS)
+UDP Local 5353 <- Remote 5353 (mDNS)
+
+Outbound:
+
+UDP Local 49501 -> Remote 5355 (LLMNR)
+UDP Local 49502 -> Remote 137 (NBNS)
+UDP Local 5353 -> Remote 5353 (mDNS)
+TCP Local 49152-65535* -> Remote 80 (WPAD)
+TCP Local 49152-65535* -> Remote 443 (WPAD)
+TCP Local 49152-65535* -> Remote 139 (SMB)
+
+*Ephemeral ports. Given values assume Windows Vista+
 
 ### Important Event IDs
 
