@@ -95,14 +95,15 @@ namespace VindicateLib
 
             Task.Run(() =>
             {
+                var clientActioner = new UdpClientActioner();
                 while (_performSending)
                 {
                     if (_settings.UseLLMNR)
-                        _nameServiceClient.SendRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, null);
+                        _nameServiceClient.SendRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, null, clientActioner);
                     if (_settings.UseNBNS)
-                        _nameServiceClient.SendRequest(_nbnsClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast);
+                        _nameServiceClient.SendRequest(_nbnsClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast, clientActioner);
                     if (_settings.UsemDNS)
-                        _nameServiceClient.SendRequest(_mdnsClient, Protocol.mDNS, _settings.mDNSTarget, null);
+                        _nameServiceClient.SendRequest(_mdnsClient, Protocol.mDNS, _settings.mDNSTarget, null, clientActioner);
 
                     OnMessagesSent();
                     Thread.Sleep(_settings.SendRequestFrequency);

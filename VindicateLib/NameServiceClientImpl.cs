@@ -25,6 +25,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using VindicateLib.Enums;
+using VindicateLib.Interfaces;
 
 namespace VindicateLib
 {
@@ -36,7 +37,7 @@ namespace VindicateLib
         private const Int32 mDNSOutboundPort = 5353;
         private readonly Random _random = new Random();
 
-        internal Byte[] SendRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress)
+        public Byte[] SendRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress, IClientActioner clientActioner)
         {
             //Define random transaction ID where relevant
             var transactionId = new Byte[] {0, 0};
@@ -52,11 +53,11 @@ namespace VindicateLib
 
             //Send datagram
             if (protocol == Protocol.LLMNR)
-                client.Send(datagram, datagram.Length, "224.0.0.252", LLMNROutboundPort);
+                clientActioner.Send(client, datagram, datagram.Length, "224.0.0.252", LLMNROutboundPort);
             else if (protocol == Protocol.NBNS)
-                client.Send(datagram, datagram.Length, subnetBroadcastAddress, NBNSOutboundPort);
+                clientActioner.Send(client, datagram, datagram.Length, subnetBroadcastAddress, NBNSOutboundPort);
             else if (protocol == Protocol.mDNS)
-                client.Send(datagram, datagram.Length, "224.0.0.251", mDNSOutboundPort);
+                clientActioner.Send(client, datagram, datagram.Length, "224.0.0.251", mDNSOutboundPort);
             else
                 throw new InvalidOperationException("Unknown protocol");
             return transactionId;

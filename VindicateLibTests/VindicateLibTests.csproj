@@ -50,6 +50,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="NameServiceClientImpl.cs" />
+    <Compile Include="UdpClientMockActioner.cs" />
     <Compile Include="WPADServiceFakeHelper.cs" />
     <Compile Include="WPADTesterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
