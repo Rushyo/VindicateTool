@@ -16,6 +16,13 @@ namespace VindicateLibTests
     [TestClass]
     public class NameServiceClientImplTests
     {
+        private const Int32 LocalLLMNRPort = 49500;
+        private const Int32 LocalNBNSPort = 49501;
+        private const Int32 LocalmDNSPort = 5353;
+        private const Int32 RemoteLLMNRPort = 5355;
+        private const Int32 RemoteNBNSPort = 137;
+        private const Int32 RemotemDNSPort = 5353;
+
         [TestMethod]
         public void SendRequestTest_LLMNR_WPAD()
         {
@@ -35,7 +42,7 @@ namespace VindicateLibTests
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
                 Assert.AreEqual(22, clientActioner.LastSendDatagramLength);
                 Assert.AreEqual("224.0.0.252", clientActioner.LastSendHostname);
-                Assert.AreEqual(5355, clientActioner.LastSendPort);
+                Assert.AreEqual(RemoteLLMNRPort, clientActioner.LastSendPort);
                 Assert.AreEqual(clientActioner.LastSendDatagram.Length, clientActioner.LastSendDatagramLength);
             }
         }
@@ -59,7 +66,7 @@ namespace VindicateLibTests
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
                 Assert.AreEqual(50, clientActioner.LastSendDatagramLength);
                 Assert.AreEqual("192.168.1.255", clientActioner.LastSendHostname);
-                Assert.AreEqual(137, clientActioner.LastSendPort);
+                Assert.AreEqual(RemoteNBNSPort, clientActioner.LastSendPort);
                 Assert.AreEqual(clientActioner.LastSendDatagram.Length, clientActioner.LastSendDatagramLength);
             }
         }
@@ -83,7 +90,7 @@ namespace VindicateLibTests
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
                 Assert.AreEqual(31, clientActioner.LastSendDatagramLength);
                 Assert.AreEqual("224.0.0.251", clientActioner.LastSendHostname);
-                Assert.AreEqual(5353, clientActioner.LastSendPort);
+                Assert.AreEqual(RemotemDNSPort, clientActioner.LastSendPort);
                 Assert.AreEqual(clientActioner.LastSendDatagram.Length, clientActioner.LastSendDatagramLength);
             }
         }
@@ -92,9 +99,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_LLMNR_Detected()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49500;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5355;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -105,10 +110,10 @@ namespace VindicateLibTests
                     0x53, 0x76, 0x63, 0x00, 0x00, 0x01, 0x00, 0x01,  0x00, 0x00, 0x00, 0x1e, 0x00, 0x04, 0xc0, 0xa8,
                     0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.LLMNR, new Byte[] {0x00, 0x00},
                     clientActioner);
@@ -116,7 +121,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemoteLLMNRPort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.LLMNR, result.Protocol);
             }
@@ -126,20 +131,20 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_DeterministicFuzz()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49500;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5355;
+            
 
-            Parallel.For(0, 10000, (i) =>
-            { 
-                var clientActioner = new UdpClientMockActioner
+            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
+            {
+                Parallel.For(0, 10000, (i) =>
                 {
-                    ReceiveBuffer = DeterministicFuzzer.GenerateByteArray(i),
-                    ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
-                };
+                    var clientActioner = new UdpClientMockActioner
+                    {
+                        ReceiveBuffer = DeterministicFuzzer.GenerateByteArray(i),
+                        ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteLLMNRPort)
+                    };
 
-                using (var client = new UdpClient(localAddress, localPort))
-                {
+
                     SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client,
                         Protocol.LLMNR, new Byte[] {0x00, 0x00},
                         clientActioner);
@@ -149,39 +154,33 @@ namespace VindicateLibTests
                     Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                     Assert.AreEqual(false, result.Detected);
                     Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                    Assert.AreEqual(remotePort, result.Endpoint.Port);
+                    Assert.AreEqual(RemoteLLMNRPort, result.Endpoint.Port);
                     Assert.IsNotNull(result.ErrorMessage);
                     Assert.AreEqual(Protocol.Unknown, result.Protocol);
-                }
-            });
+
+                });
+            }
         }
 
         [TestMethod]
         public void ReceiveAndHandleReply_EmptyResponse()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49500;
             const String remoteAddress = "192.168.1.24";
             const Int32 remotePort = 5355;
 
             var clientActioner = new UdpClientMockActioner
             {
-                ReceiveBuffer = new Byte[] { 0x00},
+                ReceiveBuffer = new Byte[] { },
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client,
                     Protocol.LLMNR, new Byte[] { 0x00, 0x00 },
                     clientActioner);
-                Assert.IsNull(result.Response);
-                Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
-                Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
-                Assert.IsNotNull(result.ErrorMessage);
-                Assert.AreEqual(Protocol.Unknown, result.Protocol);
+                Assert.IsNull(result);
             }
         }
 
@@ -189,9 +188,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_LLMNR_InvalidFlags()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49500;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5355;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -201,10 +198,10 @@ namespace VindicateLibTests
                     0x53, 0x76, 0x63, 0x00, 0x00, 0x01, 0x00, 0x01,  0x00, 0x00, 0x00, 0x1e, 0x00, 0x04, 0xc0, 0xa8,
                     0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.LLMNR, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -212,7 +209,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemoteLLMNRPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
             }
@@ -223,9 +220,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_NBNS_Detected()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49501;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 137;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -236,10 +231,10 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -247,7 +242,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.NBNS, result.Protocol);
             }
@@ -257,9 +252,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_RequestCase()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49501;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 137;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -269,10 +262,10 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -280,7 +273,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
             }
@@ -290,9 +283,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_GenericCase()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49501;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 137;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -302,10 +293,10 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -313,7 +304,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
             }
@@ -323,9 +314,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_NotInNetwork()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 49501;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 137;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -335,10 +324,10 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -346,7 +335,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
             }
@@ -356,9 +345,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_mDNS_Detected()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 5353;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5353;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -368,10 +355,10 @@ namespace VindicateLibTests
                     0x6c, 0x65, 0x2d, 0x74, 0x76, 0x05, 0x6c, 0x6f,  0x63, 0x61, 0x6c, 0x00, 0x00, 0x01, 0x00, 0x01,
                     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0xa8,  0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalmDNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -379,7 +366,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemotemDNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.mDNS, result.Protocol);
             }
@@ -389,9 +376,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_mDNS_InvalidFlags_GenericCase()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 5353;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5353;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -401,10 +386,10 @@ namespace VindicateLibTests
                     0x6c, 0x65, 0x2d, 0x74, 0x76, 0x05, 0x6c, 0x6f,  0x63, 0x61, 0x6c, 0x00, 0x00, 0x01, 0x00, 0x01,
                     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0xa8,  0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalmDNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -412,7 +397,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemotemDNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
             }
@@ -422,9 +407,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_mDNS_InvalidFlags_RequestCase()
         {
             const String localAddress = "192.168.1.1";
-            const Int32 localPort = 5353;
             const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5353;
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -434,10 +417,10 @@ namespace VindicateLibTests
                     0x6c, 0x65, 0x2d, 0x74, 0x76, 0x05, 0x6c, 0x6f,  0x63, 0x61, 0x6c, 0x00, 0x00, 0x01, 0x00, 0x01,
                     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0xa8,  0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, localPort))
+            using (var client = new UdpClient(localAddress, LocalmDNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -445,7 +428,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(remotePort, result.Endpoint.Port);
+                Assert.AreEqual(RemotemDNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
             }
