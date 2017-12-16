@@ -18,6 +18,7 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace VindicateLib
@@ -42,7 +43,6 @@ namespace VindicateLib
         public String NTLMDomain = null;
         public Int32 SendRequestFrequency = 10000;
         
-
         public Boolean SanityCheck()
         {
             if (!UseLLMNR && !UseNBNS && !UsemDNS)

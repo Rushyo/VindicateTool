@@ -184,7 +184,8 @@ namespace VindicateLib
                         Detected = false,
                         Endpoint = remoteEndpoint,
                         ErrorMessage = "Did not expect LLMNR flags other than 0x8000",
-                        Confidence = ConfidenceLevel.FalsePositive
+                        Confidence = ConfidenceLevel.FalsePositive,
+                        Protocol = Protocol.Unknown
                     };
             }
             else if (protocol == Protocol.NBNS)
@@ -196,7 +197,8 @@ namespace VindicateLib
                         Detected = false,
                         Endpoint = remoteEndpoint,
                         ErrorMessage = "Received NBNS query but expected response",
-                        Confidence = ConfidenceLevel.FalsePositive
+                        Confidence = ConfidenceLevel.FalsePositive,
+                        Protocol = Protocol.Unknown
                     };
                 }
                 if (flags[1] == 0x03) //Told not on network
@@ -206,7 +208,8 @@ namespace VindicateLib
                         Detected = false,
                         Endpoint = remoteEndpoint,
                         ErrorMessage = "NBNS target not in network",
-                        Confidence = ConfidenceLevel.FalsePositive
+                        Confidence = ConfidenceLevel.FalsePositive,
+                        Protocol = Protocol.Unknown
                     };
                 }
                 if (flags[0] >> 4 != 0x08)
@@ -215,8 +218,9 @@ namespace VindicateLib
                     {
                         Detected = false,
                         Endpoint = remoteEndpoint,
-                        ErrorMessage = "Did not expect first 4 bits of NBNS flag to be anything other than 1000",
-                        Confidence = ConfidenceLevel.FalsePositive
+                        ErrorMessage = "Did not expect first 4 bits of NBNS flag to be anything other than 0x1000",
+                        Confidence = ConfidenceLevel.FalsePositive,
+                        Protocol = Protocol.Unknown
                     };
                 }
             }
@@ -229,7 +233,8 @@ namespace VindicateLib
                         Detected = false,
                         Endpoint = remoteEndpoint,
                         ErrorMessage = "Received mDNS query but expected response",
-                        Confidence = ConfidenceLevel.FalsePositive
+                        Confidence = ConfidenceLevel.FalsePositive,
+                        Protocol = Protocol.Unknown
                     };
                 }
                 if (flags[0] >> 4 != 0x08)
@@ -238,8 +243,9 @@ namespace VindicateLib
                     {
                         Detected = false,
                         Endpoint = remoteEndpoint,
-                        ErrorMessage = "Did not expect first 4 bits of mDNS flag to be anything other than 1000",
-                        Confidence = ConfidenceLevel.FalsePositive
+                        ErrorMessage = "Did not expect first 4 bits of mDNS flag to be anything other than 0x1000",
+                        Confidence = ConfidenceLevel.FalsePositive,
+                        Protocol = Protocol.Unknown
                     };
                 }
             }
@@ -281,7 +287,7 @@ namespace VindicateLib
                     if (protocol == Protocol.NBNS)
                         nameString = DecodeNetBiosName(nameString);
                     if (protocol == Protocol.mDNS)
-                        nameLength += 6; //Skip .local
+                        nameLength += 6; //Skip .local - This will, of course, fail on lots of things
                     Byte[] typeBytes = bytesRemaining.Skip(1 + nameLength + 1).Take(2).ToArray();
                     Byte[] classBytes = bytesRemaining.Skip(3 + nameLength + 1).Take(2).ToArray();
                     Byte[] ttlBytes = bytesRemaining.Skip(5 + nameLength + 1).Take(4).ToArray();

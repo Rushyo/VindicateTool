@@ -20,7 +20,8 @@ namespace VindicateLib.Enums
 {
     public enum Protocol
     {
-        LLMNR
+        Unknown
+        , LLMNR
         , NBNS
         , mDNS
         , WPAD

@@ -19,6 +19,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -355,6 +356,7 @@ namespace VindicateLib
             ConfidenceLevelChange?.Invoke(this, HighestConfidenceLevel);
         }
 
+        [ExcludeFromCodeCoverage()]
         public void Dispose()
         {
             ((IDisposable) _llmnrClient)?.Dispose();
