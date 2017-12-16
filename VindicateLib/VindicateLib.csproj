@@ -47,7 +47,7 @@
     <Compile Include="DetectorSettings.cs" />
     <Compile Include="Enums\LogCategories.cs" />
     <Compile Include="Enums\LogEvents.cs" />
-    <Compile Include="Interfaces\IUdpActioner.cs" />
+    <Compile Include="Interfaces\IClientActioner.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Enums\LogMode.cs" />
     <Compile Include="NameServiceClientImpl.cs" />

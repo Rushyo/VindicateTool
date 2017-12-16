@@ -114,11 +114,12 @@ namespace VindicateLib
             {
                 Task.Run(() =>
                 {
+                    var clientActioner = new UdpClientActioner();
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
                         //Valid transaction IDs should be acquired from sent requests, but for now we don't validate so send whatever
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_llmnrClient, Protocol.LLMNR, null));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_llmnrClient, Protocol.LLMNR, null, clientActioner));
                         spinWait.SpinOnce();
                     }
                 });
@@ -128,10 +129,11 @@ namespace VindicateLib
             {
                 Task.Run(() =>
                 {
+                    var clientActioner = new UdpClientActioner();
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_nbnsClient, Protocol.NBNS, null));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_nbnsClient, Protocol.NBNS, null, clientActioner));
                         spinWait.SpinOnce();
                     }
                 });
@@ -141,10 +143,11 @@ namespace VindicateLib
             {
                 Task.Run(() =>
                 {
+                    var clientActioner = new UdpClientActioner();
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_mdnsClient, Protocol.mDNS, null));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_mdnsClient, Protocol.mDNS, null, clientActioner));
                         spinWait.SpinOnce();
                     }
                 });

@@ -63,13 +63,13 @@ namespace VindicateLib
             return transactionId;
         }
 
-        internal SpoofDetectionResult ReceiveAndHandleReply(UdpClient client, Protocol protocol, Byte[] transactionId)
+        internal SpoofDetectionResult ReceiveAndHandleReply(UdpClient client, Protocol protocol, Byte[] transactionId, IClientActioner clientActioner)
         {
             IPEndPoint sender = null;
             Byte[] replyBuffer;
             try
             {
-                replyBuffer = client.Receive(ref sender);
+                replyBuffer = clientActioner.Receive(client, ref sender);
             }
             catch (SocketException ex)
             {
