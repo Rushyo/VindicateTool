@@ -135,7 +135,6 @@ namespace VindicateLibTests
             {
                 var clientActioner = new UdpClientMockActioner
                 {
-                    //ProxySvc Responder Response
                     ReceiveBuffer = DeterministicFuzzer.GenerateByteArray(i),
                     ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
                 };
@@ -168,7 +167,6 @@ namespace VindicateLibTests
 
             var clientActioner = new UdpClientMockActioner
             {
-                //ProxySvc Responder Response
                 ReceiveBuffer = new Byte[] { 0x00},
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
             };
