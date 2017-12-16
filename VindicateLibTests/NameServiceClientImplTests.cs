@@ -130,9 +130,8 @@ namespace VindicateLibTests
             const String remoteAddress = "192.168.1.24";
             const Int32 remotePort = 5355;
 
-            //TODO: Make async
-            for (var i = 0; i < 10000; i++)
-            {
+            Parallel.For(0, 10000, (i) =>
+            { 
                 var clientActioner = new UdpClientMockActioner
                 {
                     ReceiveBuffer = DeterministicFuzzer.GenerateByteArray(i),
@@ -145,7 +144,7 @@ namespace VindicateLibTests
                         Protocol.LLMNR, new Byte[] {0x00, 0x00},
                         clientActioner);
                     if (result == null)
-                        continue;
+                        return;
                     Assert.IsNull(result.Response);
                     Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                     Assert.AreEqual(false, result.Detected);
@@ -154,7 +153,7 @@ namespace VindicateLibTests
                     Assert.IsNotNull(result.ErrorMessage);
                     Assert.AreEqual(Protocol.Unknown, result.Protocol);
                 }
-            }
+            });
         }
 
         [TestMethod]
