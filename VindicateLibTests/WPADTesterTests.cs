@@ -59,6 +59,7 @@ namespace VindicateLibTests
         }
 
         [TestMethod]
+        [TestCategory("Slow")]
         public void PerformWPADTest_ConnectionSinkhole()
         {
             using (Socket socket = WPADServiceFakeHelper.CreateConnectionSinkholeTcpSocket(ServerAddress, ServerPort))
@@ -77,6 +78,7 @@ namespace VindicateLibTests
         }
 
         [TestMethod]
+        [TestCategory("Slow")]
         public void PerformWPADTest_ResponseSinkhole()
         {
             using (Socket socket = WPADServiceFakeHelper.CreateHTTPSinkholeTcpSocket(ServerAddress, ServerPort))

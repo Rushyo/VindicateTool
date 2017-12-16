@@ -22,6 +22,8 @@ namespace VindicateLibTests
         private const Int32 RemoteLLMNRPort = 5355;
         private const Int32 RemoteNBNSPort = 137;
         private const Int32 RemotemDNSPort = 5353;
+        private const String LocalAddress = "192.168.1.1";
+        private const String RemoteAddress = "192.168.1.24";
 
         [TestMethod]
         public void SendRequestTest_LLMNR_WPAD()
@@ -98,9 +100,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_LLMNR_Detected()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 //ProxySvc Responder Response
@@ -110,17 +109,17 @@ namespace VindicateLibTests
                     0x53, 0x76, 0x63, 0x00, 0x00, 0x01, 0x00, 0x01,  0x00, 0x00, 0x00, 0x1e, 0x00, 0x04, 0xc0, 0xa8,
                     0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteLLMNRPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
+            using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.LLMNR, new Byte[] {0x00, 0x00},
                     clientActioner);
-                Assert.AreEqual(remoteAddress, result.Response);
+                Assert.AreEqual(RemoteAddress, result.Response);
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemoteLLMNRPort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.LLMNR, result.Protocol);
@@ -130,18 +129,14 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_DeterministicFuzz()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-            
-
-            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
+            Parallel.For(0, 10000, (i) =>
             {
-                Parallel.For(0, 10000, (i) =>
+                using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
                 {
                     var clientActioner = new UdpClientMockActioner
                     {
                         ReceiveBuffer = DeterministicFuzzer.GenerateByteArray(i),
-                        ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteLLMNRPort)
+                        ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
                     };
 
 
@@ -153,29 +148,25 @@ namespace VindicateLibTests
                     Assert.IsNull(result.Response);
                     Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                     Assert.AreEqual(false, result.Detected);
-                    Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                    Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                     Assert.AreEqual(RemoteLLMNRPort, result.Endpoint.Port);
                     Assert.IsNotNull(result.ErrorMessage);
                     Assert.AreEqual(Protocol.Unknown, result.Protocol);
-
-                });
-            }
+                }
+            });
         }
 
         [TestMethod]
         public void ReceiveAndHandleReply_EmptyResponse()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-            const Int32 remotePort = 5355;
 
             var clientActioner = new UdpClientMockActioner
             {
                 ReceiveBuffer = new Byte[] { },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), remotePort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
+            using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client,
                     Protocol.LLMNR, new Byte[] { 0x00, 0x00 },
@@ -187,9 +178,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_LLMNR_InvalidFlags()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
@@ -198,17 +186,17 @@ namespace VindicateLibTests
                     0x53, 0x76, 0x63, 0x00, 0x00, 0x01, 0x00, 0x01,  0x00, 0x00, 0x00, 0x1e, 0x00, 0x04, 0xc0, 0xa8,
                     0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteLLMNRPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalLLMNRPort))
+            using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.LLMNR, new Byte[] { 0x00, 0x00 },
                     clientActioner);
                 Assert.AreEqual("Did not expect LLMNR flags other than 0x8000", result.ErrorMessage);
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemoteLLMNRPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
@@ -219,9 +207,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_Detected()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 //WPAD-PROXY Responder Response
@@ -231,17 +216,17 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalNBNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
-                Assert.AreEqual(remoteAddress, result.Response);
+                Assert.AreEqual(RemoteAddress, result.Response);
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.NBNS, result.Protocol);
@@ -251,8 +236,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_RequestCase()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
+            
 
             var clientActioner = new UdpClientMockActioner
             {
@@ -262,17 +246,17 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalNBNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
                 Assert.AreEqual("Received NBNS query but expected response", result.ErrorMessage);
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
@@ -282,9 +266,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_GenericCase()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
@@ -293,17 +274,17 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalNBNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
                 Assert.AreEqual("Did not expect first 4 bits of NBNS flag to be anything other than 0x1000", result.ErrorMessage);
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
@@ -313,9 +294,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_NotInNetwork()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
@@ -324,17 +302,17 @@ namespace VindicateLibTests
                     0x4a, 0x43, 0x41, 0x43, 0x41, 0x43, 0x41, 0x43,  0x41, 0x43, 0x41, 0x43, 0x41, 0x00, 0x00, 0x20,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xa5, 0x00, 0x06,  0x00, 0x00, 0xc0, 0xa8, 0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemoteNBNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalNBNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
                 Assert.AreEqual("NBNS target not in network", result.ErrorMessage);
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemoteNBNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
@@ -344,9 +322,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_mDNS_Detected()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 //apple-tv.local Responder Response
@@ -355,17 +330,17 @@ namespace VindicateLibTests
                     0x6c, 0x65, 0x2d, 0x74, 0x76, 0x05, 0x6c, 0x6f,  0x63, 0x61, 0x6c, 0x00, 0x00, 0x01, 0x00, 0x01,
                     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0xa8,  0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemotemDNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalmDNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalmDNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
-                Assert.AreEqual(remoteAddress, result.Response);
+                Assert.AreEqual(RemoteAddress, result.Response);
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemotemDNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.mDNS, result.Protocol);
@@ -375,9 +350,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_mDNS_InvalidFlags_GenericCase()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 //apple-tv.local Responder Response
@@ -386,17 +358,17 @@ namespace VindicateLibTests
                     0x6c, 0x65, 0x2d, 0x74, 0x76, 0x05, 0x6c, 0x6f,  0x63, 0x61, 0x6c, 0x00, 0x00, 0x01, 0x00, 0x01,
                     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0xa8,  0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemotemDNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalmDNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalmDNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
                 Assert.AreEqual("Did not expect first 4 bits of mDNS flag to be anything other than 0x1000", result.ErrorMessage);
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemotemDNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
@@ -406,9 +378,6 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_mDNS_InvalidFlags_RequestCase()
         {
-            const String localAddress = "192.168.1.1";
-            const String remoteAddress = "192.168.1.24";
-
             var clientActioner = new UdpClientMockActioner
             {
                 //apple-tv.local Responder Response
@@ -417,17 +386,17 @@ namespace VindicateLibTests
                     0x6c, 0x65, 0x2d, 0x74, 0x76, 0x05, 0x6c, 0x6f,  0x63, 0x61, 0x6c, 0x00, 0x00, 0x01, 0x00, 0x01,
                     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0xa8,  0x01, 0x18
                 },
-                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), RemotemDNSPort)
+                ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(localAddress, LocalmDNSPort))
+            using (var client = new UdpClient(LocalAddress, LocalmDNSPort))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
                 Assert.AreEqual("Received mDNS query but expected response", result.ErrorMessage);
                 Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
                 Assert.AreEqual(false, result.Detected);
-                Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
+                Assert.AreEqual(RemoteAddress, result.Endpoint.Address.ToString());
                 Assert.AreEqual(RemotemDNSPort, result.Endpoint.Port);
                 Assert.IsNull(result.Response);
                 Assert.AreEqual(Protocol.Unknown, result.Protocol);
