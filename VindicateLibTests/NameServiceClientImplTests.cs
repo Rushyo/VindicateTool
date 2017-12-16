@@ -116,7 +116,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(5355, result.Endpoint.Port);
+                Assert.AreEqual(remotePort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.LLMNR, result.Protocol);
             }
@@ -150,7 +150,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(137, result.Endpoint.Port);
+                Assert.AreEqual(remotePort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.NBNS, result.Protocol);
             }
@@ -183,7 +183,7 @@ namespace VindicateLibTests
                 Assert.AreEqual(ConfidenceLevel.Low, result.Confidence);
                 Assert.AreEqual(true, result.Detected);
                 Assert.AreEqual(remoteAddress, result.Endpoint.Address.ToString());
-                Assert.AreEqual(5353, result.Endpoint.Port);
+                Assert.AreEqual(remotePort, result.Endpoint.Port);
                 Assert.IsNull(result.ErrorMessage);
                 Assert.AreEqual(Protocol.mDNS, result.Protocol);
             }
