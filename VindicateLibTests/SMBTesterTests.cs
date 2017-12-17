@@ -11,6 +11,7 @@ using VindicateLib.Enums;
 
 namespace VindicateLibTests
 {
+    //This class is kind of a mess, but until we have a legit SMB service we can use it's a stop-gap
     [TestClass]
     public class SMBTesterTests
     {
