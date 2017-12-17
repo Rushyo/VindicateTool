@@ -31,29 +31,30 @@ namespace VindicateLib
         {
             String error = TryTCPPort(responseResult, preferredAddress, 139);
             if (error == null)
-                return DiscoveredSMBResult(responseResult);
+                return DiscoveredSMBResult(responseResult, 139);
             error = TryTCPPort(responseResult, preferredAddress, 445);
             if (error == null)
-                return DiscoveredSMBResult(responseResult);
+                return DiscoveredSMBResult(responseResult, 445);
 
             return new SpoofDetectionResult
             {
                 Confidence = ConfidenceLevel.FalsePositive,
                 Detected = false,
-                Endpoint = responseResult.Endpoint,
+                Endpoint = new IPEndPoint(responseResult.Endpoint.Address, 445),
                 Protocol = Protocol.SMB,
                 ErrorMessage = error
             };
         }
 
-        private static SpoofDetectionResult DiscoveredSMBResult(SpoofDetectionResult responseResult)
+        private static SpoofDetectionResult DiscoveredSMBResult(SpoofDetectionResult responseResult, Int32 port)
         {
             return new SpoofDetectionResult
             {
                 Confidence = ConfidenceLevel.Medium,
                 Detected = true,
-                Endpoint = responseResult.Endpoint,
-                Protocol = Protocol.SMB
+                Endpoint = new IPEndPoint(responseResult.Endpoint.Address, port),
+                Protocol = Protocol.SMB,
+                Response = "Open"
             };
         }
 
@@ -66,7 +67,7 @@ namespace VindicateLib
                 tcpClient.Connect(responseResult.Endpoint.Address, port);
                 return null;
             }
-            catch (Exception ex)
+            catch (SocketException ex)
             {
                 return ex.Message;
             }

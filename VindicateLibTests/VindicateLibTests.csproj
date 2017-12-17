@@ -52,6 +52,8 @@
   <ItemGroup>
     <Compile Include="DeterministicFuzzer.cs" />
     <Compile Include="NameServiceClientImplTests.cs" />
+    <Compile Include="SMBServiceFakeHelper.cs" />
+    <Compile Include="SMBTesterTests.cs" />
     <Compile Include="UdpClientMockActioner.cs" />
     <Compile Include="WPADServiceFakeHelper.cs" />
     <Compile Include="WPADTesterTests.cs" />
