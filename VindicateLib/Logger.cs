@@ -19,6 +19,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using VindicateLib.Enums;
 
@@ -42,6 +43,7 @@ namespace VindicateLib
             }
         }
 
+        [ExcludeFromCodeCoverage()]
         public void LogMessage(String message, EventLogEntryType entryType, Int32 eventId = 0, Int16 category = 0, Byte[] rawData = null)
         {
 

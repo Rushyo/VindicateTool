@@ -43,6 +43,7 @@ namespace VindicateLib
         public String NTLMDomain = null;
         public Int32 SendRequestFrequency = 10000;
         
+        [ExcludeFromCodeCoverage()]
         public Boolean SanityCheck()
         {
             if (!UseLLMNR && !UseNBNS && !UsemDNS)
