@@ -15,6 +15,7 @@ namespace VindicateLibTests
     public class SMBTesterTests
     {
         private const String RemoteServerAddress = "127.0.0.1";
+        private const String LocalServerAddress = "127.0.0.1";
         private const Int32 NBOverTCPPort = 139;
         private const Int32 SMBDirectHostPort = 445;
 
@@ -25,7 +26,7 @@ namespace VindicateLibTests
             try
             {
                 SMBServiceFakeHelper.PerformSingleSMBServiceListen(tcpListener);
-                SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), "127.0.0.1");
+                SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), LocalServerAddress);
                 Assert.IsTrue(result.Detected);
                 Assert.AreEqual(ConfidenceLevel.Medium, result.Confidence);
                 Assert.AreEqual(Protocol.SMB, result.Protocol);
@@ -54,7 +55,7 @@ namespace VindicateLibTests
             try
             {
                 SMBServiceFakeHelper.PerformSingleSMBServiceListen(tcpListener);
-                SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), "127.0.0.1");
+                SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), LocalServerAddress);
                 Assert.IsTrue(result.Detected);
                 Assert.AreEqual(ConfidenceLevel.Medium, result.Confidence);
                 Assert.AreEqual(Protocol.SMB, result.Protocol);
@@ -114,11 +115,11 @@ namespace VindicateLibTests
 
 
             //Now attempt to connect to service that doesn't exist
-            SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), "127.0.0.1");
+            SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), LocalServerAddress);
             Assert.IsFalse(result.Detected);
             Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
             Assert.AreEqual(Protocol.SMB, result.Protocol);
-            Assert.AreEqual("No connection could be made because the target machine actively refused it 127.0.0.1:445", result.ErrorMessage);
+            Assert.AreEqual(String.Format("No connection could be made because the target machine actively refused it {0}:{1}", RemoteServerAddress, SMBDirectHostPort), result.ErrorMessage);
             Assert.IsNull(result.Response);
             Assert.AreEqual(RemoteServerAddress, result.Endpoint.Address.ToString());
             Assert.AreEqual(SMBDirectHostPort, result.Endpoint.Port);
