@@ -27,30 +27,48 @@ namespace VindicateLib
     internal static class SMBTester
     {
 
-        public static SpoofDetectionResult PerformSMBTest(SpoofDetectionResult result, String preferredAddress)
+        public static SpoofDetectionResult PerformSMBTest(SpoofDetectionResult responseResult, String preferredAddress)
         {
-            var tcpClient = new TcpClient(new IPEndPoint(NetworkHelper.GetNetworkAddressInformation(preferredAddress).Address, 0));
+            String error = TryTCPPort(responseResult, preferredAddress, 139);
+            if (error == null)
+                return DiscoveredSMBResult(responseResult);
+            error = TryTCPPort(responseResult, preferredAddress, 445);
+            if (error == null)
+                return DiscoveredSMBResult(responseResult);
+
+            return new SpoofDetectionResult
+            {
+                Confidence = ConfidenceLevel.FalsePositive,
+                Detected = false,
+                Endpoint = responseResult.Endpoint,
+                Protocol = Protocol.SMB,
+                ErrorMessage = error
+            };
+        }
+
+        private static SpoofDetectionResult DiscoveredSMBResult(SpoofDetectionResult responseResult)
+        {
+            return new SpoofDetectionResult
+            {
+                Confidence = ConfidenceLevel.Medium,
+                Detected = true,
+                Endpoint = responseResult.Endpoint,
+                Protocol = Protocol.SMB
+            };
+        }
+
+        private static String TryTCPPort(SpoofDetectionResult responseResult, String preferredAddress, Int32 port)
+        {
+            var tcpClient = new TcpClient(new IPEndPoint(NetworkHelper.GetNetworkAddressInformation(preferredAddress).Address,
+                0));
             try
             {
-                tcpClient.Connect(result.Endpoint.Address, 139);
-                return new SpoofDetectionResult
-                {
-                    Confidence = ConfidenceLevel.Medium,
-                    Detected = true,
-                    Endpoint = result.Endpoint,
-                    Protocol = Protocol.SMB
-                };
+                tcpClient.Connect(responseResult.Endpoint.Address, port);
+                return null;
             }
             catch (Exception ex)
             {
-                return new SpoofDetectionResult
-                {
-                    Confidence = ConfidenceLevel.FalsePositive,
-                    Detected = false,
-                    Endpoint = result.Endpoint,
-                    Protocol = Protocol.SMB,
-                    ErrorMessage = ex.Message
-                };
+                return ex.Message;
             }
             finally
             {
