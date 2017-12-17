@@ -30,6 +30,7 @@ namespace VindicateLib
         public static UnicastIPAddressInformation GetNetworkAddressInformation(String preferredAddress)
         {
             //Get list of active IPv4 interface addresses
+#warning GetAllNetworkInterfaces not supported outside Linux + Windows
             IEnumerable<UnicastIPAddressInformation> eligibleAddresses = NetworkInterface
                 .GetAllNetworkInterfaces()
                 .Where(i => i.OperationalStatus == OperationalStatus.Up || i.OperationalStatus == OperationalStatus.Unknown)
