@@ -89,6 +89,7 @@ namespace VindicateLib
                     Endpoint = null,
                     ErrorMessage = String.Format("Unable to parse packet sent to port {0}",
                         ((IPEndPoint) client.Client.LocalEndPoint).Port)
+                    , Protocol = Protocol.Unknown
                 };
                 try
                 {
@@ -263,7 +264,13 @@ namespace VindicateLib
             Int32 additionalResponses = BitConverter.ToUInt16(replyBuffer.Skip(10).Take(2).Reverse().ToArray(), 0);
             Int32 totalResponses = answerResponses + authorityResponses + additionalResponses;
             if (answerResponses == 0)
-                return new SpoofDetectionResult() { Detected = false, Endpoint = remoteEndpoint, ErrorMessage = "Received reply with no answers", Confidence = ConfidenceLevel.FalsePositive };
+                return new SpoofDetectionResult {
+                    Detected = false
+                    , Endpoint = remoteEndpoint
+                    , ErrorMessage = "Received reply with no answers"
+                    , Confidence = ConfidenceLevel.FalsePositive
+                    , Protocol = Protocol.Unknown
+                };
 
             var queryListBytes = new ArraySegment<Byte>(replyBuffer, 12, replyBuffer.Length - 12);
 
@@ -301,7 +308,8 @@ namespace VindicateLib
                             Detected = false,
                             Endpoint = remoteEndpoint,
                             ErrorMessage = "Expected data length 4, instead received " + dataLength,
-                            Confidence = ConfidenceLevel.Low
+                            Confidence = ConfidenceLevel.FalsePositive,
+                            Protocol = Protocol.Unknown
                         };
                     }
                     else if (protocol == Protocol.NBNS)
@@ -313,7 +321,8 @@ namespace VindicateLib
                                 Detected = false,
                                 Endpoint = remoteEndpoint,
                                 ErrorMessage = "Expected data length 6, instead received " + dataLength,
-                                Confidence = ConfidenceLevel.Low
+                                Confidence = ConfidenceLevel.FalsePositive,
+                                Protocol = Protocol.Unknown
                             };
                         }
                         jumpBytes = 2;
