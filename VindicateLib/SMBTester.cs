@@ -27,44 +27,44 @@ namespace VindicateLib
     internal static class SMBTester
     {
 
-        public static SpoofDetectionResult PerformSMBTest(SpoofDetectionResult responseResult, String preferredAddress)
+        public static SpoofDetectionResult PerformSMBTest(IPAddress remoteAddress, String preferredAddress)
         {
-            String error = TryTCPPort(responseResult, preferredAddress, 139);
+            String error = TryTCPPort(remoteAddress, preferredAddress, 139);
             if (error == null)
-                return DiscoveredSMBResult(responseResult, 139);
-            error = TryTCPPort(responseResult, preferredAddress, 445);
+                return DiscoveredSMBResult(remoteAddress, 139);
+            error = TryTCPPort(remoteAddress, preferredAddress, 445);
             if (error == null)
-                return DiscoveredSMBResult(responseResult, 445);
+                return DiscoveredSMBResult(remoteAddress, 445);
 
             return new SpoofDetectionResult
             {
                 Confidence = ConfidenceLevel.FalsePositive,
                 Detected = false,
-                Endpoint = new IPEndPoint(responseResult.Endpoint.Address, 445),
+                Endpoint = new IPEndPoint(remoteAddress, 445),
                 Protocol = Protocol.SMB,
                 ErrorMessage = error
             };
         }
 
-        private static SpoofDetectionResult DiscoveredSMBResult(SpoofDetectionResult responseResult, Int32 port)
+        private static SpoofDetectionResult DiscoveredSMBResult(IPAddress remoteAddress, Int32 port)
         {
             return new SpoofDetectionResult
             {
                 Confidence = ConfidenceLevel.Medium,
                 Detected = true,
-                Endpoint = new IPEndPoint(responseResult.Endpoint.Address, port),
+                Endpoint = new IPEndPoint(remoteAddress, port),
                 Protocol = Protocol.SMB,
                 Response = "Open"
             };
         }
 
-        private static String TryTCPPort(SpoofDetectionResult responseResult, String preferredAddress, Int32 port)
+        private static String TryTCPPort(IPAddress remoteAddress, String preferredAddress, Int32 port)
         {
             var tcpClient = new TcpClient(new IPEndPoint(NetworkHelper.GetNetworkAddressInformation(preferredAddress).Address,
                 0));
             try
             {
-                tcpClient.Connect(responseResult.Endpoint.Address, port);
+                tcpClient.Connect(remoteAddress, port);
                 return null;
             }
             catch (SocketException ex)

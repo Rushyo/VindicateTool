@@ -226,7 +226,7 @@ namespace VindicateLib
 
         private void TestForSMB(SpoofDetectionResult result)
         {
-            SpoofDetectionResult smbTestResult = SMBTester.PerformSMBTest(result, _settings.PreferredIPv4Address);
+            SpoofDetectionResult smbTestResult = SMBTester.PerformSMBTest(result.Endpoint.Address, _settings.PreferredIPv4Address);
             if (smbTestResult.Detected)
             {
                 _logger.LogMessage(String.Format("Detected service on SMB TCP port at {0}",

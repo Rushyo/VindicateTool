@@ -24,18 +24,8 @@ namespace VindicateLibTests
             TcpListener tcpListener = SMBServiceFakeHelper.CreateSMBService(NBOverTCPPort);
             try
             {
-                //TODO: Refactor SMB tester so this isn't necessary
-                var responseResult = new SpoofDetectionResult()
-                {
-                    Confidence = ConfidenceLevel.Low,
-                    Detected = true,
-                    Endpoint = new IPEndPoint(IPAddress.Parse(RemoteServerAddress), 5353),
-                    ErrorMessage = null,
-                    Protocol = Protocol.LLMNR,
-                    Response = RemoteServerAddress
-                };
                 SMBServiceFakeHelper.PerformSingleSMBServiceListen(tcpListener);
-                SpoofDetectionResult result = SMBTester.PerformSMBTest(responseResult, "127.0.0.1");
+                SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), "127.0.0.1");
                 Assert.IsTrue(result.Detected);
                 Assert.AreEqual(ConfidenceLevel.Medium, result.Confidence);
                 Assert.AreEqual(Protocol.SMB, result.Protocol);
@@ -63,18 +53,8 @@ namespace VindicateLibTests
             TcpListener tcpListener = SMBServiceFakeHelper.CreateSMBService(SMBDirectHostPort);
             try
             {
-                //TODO: Refactor SMB tester so this isn't necessary
-                var responseResult = new SpoofDetectionResult()
-                {
-                    Confidence = ConfidenceLevel.Low,
-                    Detected = true,
-                    Endpoint = new IPEndPoint(IPAddress.Parse(RemoteServerAddress), 5353),
-                    ErrorMessage = null,
-                    Protocol = Protocol.LLMNR,
-                    Response = RemoteServerAddress
-                };
                 SMBServiceFakeHelper.PerformSingleSMBServiceListen(tcpListener);
-                SpoofDetectionResult result = SMBTester.PerformSMBTest(responseResult, "127.0.0.1");
+                SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), "127.0.0.1");
                 Assert.IsTrue(result.Detected);
                 Assert.AreEqual(ConfidenceLevel.Medium, result.Confidence);
                 Assert.AreEqual(Protocol.SMB, result.Protocol);
@@ -134,18 +114,7 @@ namespace VindicateLibTests
 
 
             //Now attempt to connect to service that doesn't exist
-            //TODO: Refactor SMB tester so this isn't necessary
-            var responseResult = new SpoofDetectionResult()
-            {
-                Confidence = ConfidenceLevel.Low,
-                Detected = true,
-                Endpoint = new IPEndPoint(IPAddress.Parse(RemoteServerAddress), 5353),
-                ErrorMessage = null,
-                Protocol = Protocol.LLMNR,
-                Response = RemoteServerAddress
-            };
-
-            SpoofDetectionResult result = SMBTester.PerformSMBTest(responseResult, "127.0.0.1");
+            SpoofDetectionResult result = SMBTester.PerformSMBTest(IPAddress.Parse(RemoteServerAddress), "127.0.0.1");
             Assert.IsFalse(result.Detected);
             Assert.AreEqual(ConfidenceLevel.FalsePositive, result.Confidence);
             Assert.AreEqual(Protocol.SMB, result.Protocol);
