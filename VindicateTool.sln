@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VindicateService", "Vindica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VindicateLibTests", "VindicateLibTests\VindicateLibTests.csproj", "{5BA91E95-BAF6-4175-8B9E-DEA338E0C5FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VindicateFirewallLib", "VindicateFirewallLib\VindicateFirewallLib.csproj", "{979BBC6D-C59E-481C-9034-DE193C1BDAD9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5BA91E95-BAF6-4175-8B9E-DEA338E0C5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BA91E95-BAF6-4175-8B9E-DEA338E0C5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BA91E95-BAF6-4175-8B9E-DEA338E0C5FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{979BBC6D-C59E-481C-9034-DE193C1BDAD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{979BBC6D-C59E-481C-9034-DE193C1BDAD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{979BBC6D-C59E-481C-9034-DE193C1BDAD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{979BBC6D-C59E-481C-9034-DE193C1BDAD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
