@@ -55,6 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\Protocol.cs" />
     <Compile Include="SMBTester.cs" />
+    <Compile Include="SocketLoader.cs" />
     <Compile Include="SpoofDetectionResult.cs" />
     <Compile Include="ClientActioner.cs" />
     <Compile Include="WPADTester.cs" />

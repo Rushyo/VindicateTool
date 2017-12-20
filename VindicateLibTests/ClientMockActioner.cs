@@ -36,14 +36,14 @@ namespace VindicateLibTests
         public Byte[] ReceiveBuffer = null;
         public IPEndPoint ReceiveEndPoint = null;
 
-        public void Send(UdpClient client, Byte[] datagram, String hostname, Int32 port)
+        public void Send(Socket client, Byte[] datagram, String hostname, Int32 port)
         {
             LastSendDatagram = datagram;
             LastSendHostname = hostname;
             LastSendPort = port;
         }
 
-        public Byte[] Receive(UdpClient client, out IPEndPoint remoteEndPoint)
+        public Byte[] Receive(Socket client, out IPEndPoint remoteEndPoint)
         {
             remoteEndPoint = ReceiveEndPoint;
             return ReceiveBuffer;

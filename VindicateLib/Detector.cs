@@ -37,7 +37,7 @@ namespace VindicateLib
         private readonly NameServiceClientImpl _nameServiceClient;
         private ConfidenceLevel _highestConfidenceLevel = ConfidenceLevel.FalsePositive;
         private Random _fastRandom;
-        private UdpClient _llmnrClient, _nbnsClient, _mdnsClient;
+        private Socket _llmnrClient, _nbnsClient, _mdnsClient;
         private String _localBroadcast;
         private Boolean _performSending = false;
         private Boolean _performListening = false;
@@ -100,7 +100,7 @@ namespace VindicateLib
                 while (_performSending)
                 {
                     if (_settings.UseLLMNR)
-                        _nameServiceClient.SendRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, null, clientActioner);
+                        _nameServiceClient.SendRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, _localBroadcast, clientActioner);
                     if (_settings.UseNBNS)
                         _nameServiceClient.SendRequest(_nbnsClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast, clientActioner);
                     if (_settings.UsemDNS)
@@ -281,55 +281,25 @@ namespace VindicateLib
         {
             if (_settings.UseLLMNR)
             {
-                _llmnrClient = LoadUDPClient(Protocol.LLMNR, _settings.LLMNRPort);
+                _llmnrClient = SocketLoader.LoadUDPSocket(Protocol.LLMNR, _settings.LLMNRPort, _settings.Verbose, _logger);
                 if (_llmnrClient == null)
                     _settings.UseLLMNR = false;
             }
             if (_settings.UseNBNS)
             {
-                _nbnsClient = LoadUDPClient(Protocol.NBNS, _settings.NBNSPort);
+                _nbnsClient = SocketLoader.LoadUDPSocket(Protocol.NBNS, _settings.NBNSPort, _settings.Verbose, _logger);
                 if (_nbnsClient == null)
                     _settings.UseNBNS = false;
             }
             if (_settings.UsemDNS)
             {
-                _mdnsClient = LoadUDPClient(Protocol.mDNS, _settings.mDNSPort);
+                _mdnsClient = SocketLoader.LoadUDPSocket(Protocol.mDNS, _settings.mDNSPort, _settings.Verbose, _logger);
                 if (_mdnsClient == null)
                     _settings.UsemDNS = false;
             }
         }
 
-        private UdpClient LoadUDPClient(Protocol protocol, Int32 port)
-        {
-            UdpClient client = null;
-            try
-            {
-                client = new UdpClient(port)
-                {
-                    Client =
-                    {
-                        ReceiveTimeout = 0,
-                    },
-                    DontFragment = true,
-                    EnableBroadcast = true,
-                    MulticastLoopback = false
-                };
-
-                if(protocol == Protocol.mDNS)
-                    client.JoinMulticastGroup(IPAddress.Parse("224.0.0.251"));
-
-                if (_settings.Verbose)
-                    _logger.LogMessage(String.Format("Loaded {0} service on port {1}", protocol, port), EventLogEntryType.Information, (Int32)LogEvents.LoadedUdpClient, (Int16)LogCategories.LoadingInfo);
-            }
-            catch (SocketException ex)
-            {
-                _logger.LogMessage(String.Format("Unable to load {0} service ({2}). Disabling. Port {1} in use or insufficient privileges?", protocol, port, ex.Message), EventLogEntryType.Error
-                    , (Int32)LogEvents.UnableToLoadUdpClient, (Int16)LogCategories.NonFatalError);
-                return null;
-            }
-
-            return client;
-        }
+        
 
         private String GenerateRandomPassword()
         {

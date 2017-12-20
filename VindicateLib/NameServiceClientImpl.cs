@@ -37,7 +37,7 @@ namespace VindicateLib
         private const Int32 mDNSOutboundPort = 5353;
         private readonly Random _random = new Random();
 
-        public Byte[] SendRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress, IClientActioner clientActioner)
+        public Byte[] SendRequest(Socket client, Protocol protocol, String lookupName, String subnetBroadcastAddress, IClientActioner clientActioner)
         {
             Byte[] transactionId = GenerateTransactionId(protocol);
 
@@ -49,7 +49,7 @@ namespace VindicateLib
 
             //Send datagram
             if (protocol == Protocol.LLMNR)
-                clientActioner.Send(client, datagram, "224.0.0.252", LLMNROutboundPort);
+                clientActioner.Send(client, datagram, subnetBroadcastAddress, LLMNROutboundPort);
             else if (protocol == Protocol.NBNS)
                 clientActioner.Send(client, datagram, subnetBroadcastAddress, NBNSOutboundPort);
             else if (protocol == Protocol.mDNS)
@@ -57,6 +57,8 @@ namespace VindicateLib
             else
                 throw new InvalidOperationException("Unknown protocol");
             return transactionId;
+
+            new UdpClient();
         }
 
         private Byte[] GenerateTransactionId(Protocol protocol)
@@ -68,7 +70,7 @@ namespace VindicateLib
             return transactionId;
         }
 
-        internal SpoofDetectionResult ReceiveAndHandleReply(UdpClient client, Protocol protocol, Byte[] transactionId, IClientActioner clientActioner)
+        internal SpoofDetectionResult ReceiveAndHandleReply(Socket client, Protocol protocol, Byte[] transactionId, IClientActioner clientActioner)
         {
             IPEndPoint sender = null;
             Byte[] replyBuffer;
@@ -94,7 +96,7 @@ namespace VindicateLib
                 Detected = false,
                 Endpoint = null,
                 ErrorMessage = String.Format("Unable to parse packet sent to port {0}",
-                    ((IPEndPoint) client.Client.LocalEndPoint).Port)
+                    ((IPEndPoint) client.LocalEndPoint)?.Port)
                 , Protocol = Protocol.Unknown
             };
             try

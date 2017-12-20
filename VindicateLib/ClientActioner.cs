@@ -17,6 +17,10 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using VindicateLib.Interfaces;
@@ -25,15 +29,48 @@ namespace VindicateLib
 {
     public class ClientActioner : IClientActioner
     {
-        public void Send(UdpClient client, Byte[] datagram, String hostname, Int32 port)
+        public void Send(Socket client, Byte[] datagram, String hostname, Int32 port)
         {
-            client.Send(datagram, datagram.Length, hostname, port);
+            if (client.SocketType == SocketType.Dgram)
+            {
+                client.SendTo(datagram, SocketFlags.None, new IPEndPoint(IPAddress.Parse(hostname), port));
+            }
+            else if (client.SocketType == SocketType.Stream)
+            {
+                client.Connect(hostname, port);
+                client.Send(datagram, SocketFlags.None);
+                client.Disconnect(true);
+            }
         }
 
-        public Byte[] Receive(UdpClient client, out IPEndPoint remoteEndPoint)
+        public Byte[] Receive(Socket client, out IPEndPoint remoteEndPoint)
         {
-            remoteEndPoint = null;
-            return client.Receive(ref remoteEndPoint);
+            var buffer = new Byte[4096];
+            
+            if (client.SocketType == SocketType.Dgram)
+            {
+                EndPoint socketEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                Int32 read = client.ReceiveFrom(buffer, buffer.Length, SocketFlags.None, ref socketEndPoint);
+                remoteEndPoint = (IPEndPoint)socketEndPoint;
+                return buffer.Take(read).ToArray();
+            }
+            else if (client.SocketType == SocketType.Stream)
+            {
+                client.Listen(1);
+                using (Socket newSocket = client.Accept())
+                {
+                    remoteEndPoint = (IPEndPoint) newSocket.RemoteEndPoint;
+                    var data = new List<Byte>();
+                    while (client.Available != 0)
+                    {
+                        Int32 read = client.Receive(buffer);
+                        data.AddRange(buffer.Take(read));
+                    }
+                    client.Close();
+                    return data.ToArray();
+                }
+            }
+            throw new InvalidOperationException("Unknown socket type");
         }
     }
 }

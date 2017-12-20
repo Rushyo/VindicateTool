@@ -48,7 +48,7 @@ namespace VindicateLibTests
         {
             var clientActioner = new ClientMockActioner();
 
-            using (var client = new UdpClient())
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 Byte[] transactionId =
                     new NameServiceClientImpl().SendRequest(client, Protocol.LLMNR, "WPAD", "192.168.1.255", clientActioner);
@@ -70,7 +70,7 @@ namespace VindicateLibTests
         {
             var clientActioner = new ClientMockActioner();
 
-            using (var client = new UdpClient())
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 Byte[] transactionId =
                     new NameServiceClientImpl().SendRequest(client, Protocol.NBNS, "WPAD", "192.168.1.255", clientActioner);
@@ -92,7 +92,7 @@ namespace VindicateLibTests
         {
             var clientActioner = new ClientMockActioner();
 
-            using (var client = new UdpClient())
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 Byte[] transactionId =
                     new NameServiceClientImpl().SendRequest(client, Protocol.mDNS, "appletv", "192.168.1.255", clientActioner);
@@ -124,7 +124,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.LLMNR, new Byte[] {0x00, 0x00},
                     clientActioner);
@@ -143,7 +143,7 @@ namespace VindicateLibTests
         {
             Parallel.For(0, 10000, (i) =>
             {
-                using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
+                using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
                 {
                     var clientActioner = new ClientMockActioner
                     {
@@ -178,7 +178,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client,
                     Protocol.LLMNR, new Byte[] { 0x00, 0x00 },
@@ -201,7 +201,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.LLMNR, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -231,7 +231,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -261,7 +261,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -289,7 +289,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -317,7 +317,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteNBNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalNBNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.NBNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -345,7 +345,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalmDNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -373,7 +373,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalmDNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
@@ -401,7 +401,7 @@ namespace VindicateLibTests
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemotemDNSPort)
             };
 
-            using (var client = new UdpClient(LocalAddress, LocalmDNSPort))
+            using (var client = new Socket(SocketType.Dgram, ProtocolType.Udp))
             {
                 SpoofDetectionResult result = new NameServiceClientImpl().ReceiveAndHandleReply(client, Protocol.mDNS, new Byte[] { 0x00, 0x00 },
                     clientActioner);
