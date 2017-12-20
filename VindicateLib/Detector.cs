@@ -37,7 +37,7 @@ namespace VindicateLib
         private readonly NameServiceClientImpl _nameServiceClient;
         private ConfidenceLevel _highestConfidenceLevel = ConfidenceLevel.FalsePositive;
         private Random _fastRandom;
-        private Socket _llmnrClient, _nbnsClient, _mdnsClient;
+        private Socket _llmnrUDPClient, _nbnsUDPClient, _mdnsUDPClient;
         private String _localBroadcast;
         private Boolean _performSending = false;
         private Boolean _performListening = false;
@@ -100,11 +100,14 @@ namespace VindicateLib
                 while (_performSending)
                 {
                     if (_settings.UseLLMNR)
-                        _nameServiceClient.SendRequest(_llmnrClient, Protocol.LLMNR, _settings.LLMNRTarget, _localBroadcast, clientActioner);
+                        _nameServiceClient.SendRequest(_llmnrUDPClient, Protocol.LLMNR, _settings.LLMNRTarget, _localBroadcast, clientActioner);
                     if (_settings.UseNBNS)
-                        _nameServiceClient.SendRequest(_nbnsClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast, clientActioner);
+                    {
+                        _nameServiceClient.SendRequest(_nbnsUDPClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast, clientActioner);
+
+                    }
                     if (_settings.UsemDNS)
-                        _nameServiceClient.SendRequest(_mdnsClient, Protocol.mDNS, _settings.mDNSTarget, null, clientActioner);
+                        _nameServiceClient.SendRequest(_mdnsUDPClient, Protocol.mDNS, _settings.mDNSTarget, null, clientActioner);
 
                     OnMessagesSent();
                     Thread.Sleep(_settings.SendRequestFrequency);
@@ -120,7 +123,7 @@ namespace VindicateLib
                     while (_performListening)
                     {
                         //Valid transaction IDs should be acquired from sent requests, but for now we don't validate so send whatever
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_llmnrClient, Protocol.LLMNR, null, clientActioner));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_llmnrUDPClient, Protocol.LLMNR, null, clientActioner));
                         spinWait.SpinOnce();
                     }
                 });
@@ -134,7 +137,7 @@ namespace VindicateLib
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_nbnsClient, Protocol.NBNS, null, clientActioner));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_nbnsUDPClient, Protocol.NBNS, null, clientActioner));
                         spinWait.SpinOnce();
                     }
                 });
@@ -148,7 +151,7 @@ namespace VindicateLib
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
-                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_mdnsClient, Protocol.mDNS, null, clientActioner));
+                        HandleResponseReceivedResult(_nameServiceClient.ReceiveAndHandleReply(_mdnsUDPClient, Protocol.mDNS, null, clientActioner));
                         spinWait.SpinOnce();
                     }
                 });
@@ -159,9 +162,9 @@ namespace VindicateLib
         {
             _performSending = false;
             _performListening = false;
-            _llmnrClient?.Close();
-            _nbnsClient?.Close();
-            _mdnsClient?.Close();
+            _llmnrUDPClient?.Close();
+            _nbnsUDPClient?.Close();
+            _mdnsUDPClient?.Close();
         }
 
 
@@ -173,7 +176,7 @@ namespace VindicateLib
             {
                 if (_localBroadcast == null)
                 {
-                    _logger.LogMessage("Unable to find broadcast address for NBNS", EventLogEntryType.Information,
+                    _logger.LogMessage("Unable to find broadcast address for NBNS - disabling NBNS", EventLogEntryType.Information,
                         (Int32) LogEvents.NoBroadcastAdapterFound, (Int16) LogCategories.NonFatalError);
                     _settings.UseNBNS = false;
                 }
@@ -281,20 +284,20 @@ namespace VindicateLib
         {
             if (_settings.UseLLMNR)
             {
-                _llmnrClient = SocketLoader.LoadUDPSocket(Protocol.LLMNR, _settings.LLMNRPort, _settings.Verbose, _logger);
-                if (_llmnrClient == null)
+                _llmnrUDPClient = SocketLoader.LoadUDPSocket(Protocol.LLMNR, _settings.LLMNRPort, _settings.Verbose, _logger);
+                if (_llmnrUDPClient == null)
                     _settings.UseLLMNR = false;
             }
             if (_settings.UseNBNS)
             {
-                _nbnsClient = SocketLoader.LoadUDPSocket(Protocol.NBNS, _settings.NBNSPort, _settings.Verbose, _logger);
-                if (_nbnsClient == null)
+                _nbnsUDPClient = SocketLoader.LoadUDPSocket(Protocol.NBNS, _settings.NBNSPort, _settings.Verbose, _logger);
+                if (_nbnsUDPClient == null)
                     _settings.UseNBNS = false;
             }
             if (_settings.UsemDNS)
             {
-                _mdnsClient = SocketLoader.LoadUDPSocket(Protocol.mDNS, _settings.mDNSPort, _settings.Verbose, _logger);
-                if (_mdnsClient == null)
+                _mdnsUDPClient = SocketLoader.LoadUDPSocket(Protocol.mDNS, _settings.mDNSPort, _settings.Verbose, _logger);
+                if (_mdnsUDPClient == null)
                     _settings.UsemDNS = false;
             }
         }
@@ -329,9 +332,9 @@ namespace VindicateLib
         [ExcludeFromCodeCoverage()]
         public void Dispose()
         {
-            ((IDisposable) _llmnrClient)?.Dispose();
-            ((IDisposable) _nbnsClient)?.Dispose();
-            ((IDisposable) _mdnsClient)?.Dispose();
+            ((IDisposable) _llmnrUDPClient)?.Dispose();
+            ((IDisposable) _nbnsUDPClient)?.Dispose();
+            ((IDisposable) _mdnsUDPClient)?.Dispose();
         }
     }
 }

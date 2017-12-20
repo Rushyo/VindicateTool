@@ -61,12 +61,12 @@ namespace VindicateLib
                 {
                     remoteEndPoint = (IPEndPoint) newSocket.RemoteEndPoint;
                     var data = new List<Byte>();
-                    while (client.Available != 0)
+                    while (newSocket.Available != 0)
                     {
-                        Int32 read = client.Receive(buffer);
+                        Int32 read = newSocket.Receive(buffer);
                         data.AddRange(buffer.Take(read));
                     }
-                    client.Close();
+                    newSocket.Disconnect(true);
                     return data.ToArray();
                 }
             }

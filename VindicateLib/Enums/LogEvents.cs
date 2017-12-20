@@ -34,6 +34,8 @@ namespace VindicateLib.Enums
         SMBTestSucceeded = 11,
         SMBTestFailed = 12,
         RunningAsAdmin = 13,
-        InvalidArguments = 14
+        InvalidArguments = 14,
+        LoadedTcpClient = 15,
+        UnableToLoadTcpClient = 16
     }
 }
