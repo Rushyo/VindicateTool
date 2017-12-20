@@ -27,7 +27,7 @@ using VindicateLib.Interfaces;
 
 namespace VindicateLibTests
 {
-    public class UdpClientMockActioner : IClientActioner
+    public class ClientMockActioner : IClientActioner
     {
         public Byte[] LastSendDatagram;
         public Int32 LastSendDatagramLength;

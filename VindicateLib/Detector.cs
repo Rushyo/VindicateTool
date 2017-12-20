@@ -96,7 +96,7 @@ namespace VindicateLib
 
             Task.Run(() =>
             {
-                var clientActioner = new UdpClientActioner();
+                var clientActioner = new ClientActioner();
                 while (_performSending)
                 {
                     if (_settings.UseLLMNR)
@@ -115,7 +115,7 @@ namespace VindicateLib
             {
                 Task.Run(() =>
                 {
-                    var clientActioner = new UdpClientActioner();
+                    var clientActioner = new ClientActioner();
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
@@ -130,7 +130,7 @@ namespace VindicateLib
             {
                 Task.Run(() =>
                 {
-                    var clientActioner = new UdpClientActioner();
+                    var clientActioner = new ClientActioner();
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {
@@ -144,7 +144,7 @@ namespace VindicateLib
             {
                 Task.Run(() =>
                 {
-                    var clientActioner = new UdpClientActioner();
+                    var clientActioner = new ClientActioner();
                     var spinWait = new SpinWait();
                     while (_performListening)
                     {

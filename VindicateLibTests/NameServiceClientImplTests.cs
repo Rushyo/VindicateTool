@@ -46,7 +46,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void SendRequestTest_LLMNR_WPAD()
         {
-            var clientActioner = new UdpClientMockActioner();
+            var clientActioner = new ClientMockActioner();
 
             using (var client = new UdpClient())
             {
@@ -57,7 +57,7 @@ namespace VindicateLibTests
                         new Byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x57, 0x50, 0x41, 0x44, 0x00, 0x00, 0x01, 0x00, 0x01 }
                     ).ToArray();
                 //Console.WriteLine(BitConverter.ToString(expectedDatagram));
-                //Console.WriteLine(BitConverter.ToString(clientActioner.LastSendDatagram));
+                //Console.WriteLine(BitConverter.ToString(udpClientActioner.LastSendDatagram));
 
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
                 Assert.AreEqual(22, clientActioner.LastSendDatagramLength);
@@ -70,7 +70,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void SendRequestTest_NBNS_WPAD()
         {
-            var clientActioner = new UdpClientMockActioner();
+            var clientActioner = new ClientMockActioner();
 
             using (var client = new UdpClient())
             {
@@ -94,7 +94,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void SendRequestTest_mDNS_appletv()
         {
-            var clientActioner = new UdpClientMockActioner();
+            var clientActioner = new ClientMockActioner();
 
             using (var client = new UdpClient())
             {
@@ -118,7 +118,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_LLMNR_Detected()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 //ProxySvc Responder Response
                 ReceiveBuffer = new Byte[] {
@@ -151,7 +151,7 @@ namespace VindicateLibTests
             {
                 using (var client = new UdpClient(LocalAddress, LocalLLMNRPort))
                 {
-                    var clientActioner = new UdpClientMockActioner
+                    var clientActioner = new ClientMockActioner
                     {
                         ReceiveBuffer = DeterministicFuzzer.GenerateByteArray(i),
                         ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
@@ -178,7 +178,7 @@ namespace VindicateLibTests
         public void ReceiveAndHandleReply_EmptyResponse()
         {
 
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 ReceiveBuffer = new Byte[] { },
                 ReceiveEndPoint = new IPEndPoint(IPAddress.Parse(RemoteAddress), RemoteLLMNRPort)
@@ -196,7 +196,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_LLMNR_InvalidFlags()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
                     0x8e, 0x32, 0xDE, 0xAD, 0x00, 0x01, 0x00, 0x01,  0x00, 0x00, 0x00, 0x00, 0x08, 0x50, 0x72, 0x6f,
@@ -225,7 +225,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_Detected()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 //WPAD-PROXY Responder Response
                 ReceiveBuffer = new Byte[] {
@@ -256,7 +256,7 @@ namespace VindicateLibTests
         {
             
 
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
                     0x81, 0xc6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,  0x00, 0x00, 0x00, 0x00, 0x20, 0x46, 0x48, 0x46,
@@ -284,7 +284,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_GenericCase()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
                     0x81, 0xc6, 0xDE, 0xAD, 0x00, 0x00, 0x00, 0x01,  0x00, 0x00, 0x00, 0x00, 0x20, 0x46, 0x48, 0x46,
@@ -312,7 +312,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_NBNS_InvalidFlags_NotInNetwork()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 ReceiveBuffer = new Byte[] {
                     0x81, 0xc6, 0x85, 0x03, 0x00, 0x00, 0x00, 0x01,  0x00, 0x00, 0x00, 0x00, 0x20, 0x46, 0x48, 0x46,
@@ -340,7 +340,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_mDNS_Detected()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 //apple-tv.local Responder Response
                 ReceiveBuffer = new Byte[] {
@@ -368,7 +368,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_mDNS_InvalidFlags_GenericCase()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 //apple-tv.local Responder Response
                 ReceiveBuffer = new Byte[] {
@@ -396,7 +396,7 @@ namespace VindicateLibTests
         [TestMethod]
         public void ReceiveAndHandleReply_mDNS_InvalidFlags_RequestCase()
         {
-            var clientActioner = new UdpClientMockActioner
+            var clientActioner = new ClientMockActioner
             {
                 //apple-tv.local Responder Response
                 ReceiveBuffer = new Byte[] {

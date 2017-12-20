@@ -28,7 +28,7 @@ namespace VindicateLib.Interfaces
 {
     internal interface IClientActioner
     {
-        void Send(UdpClient client, Byte[] datagram, Int32 datagramLength, String hostname, Int32 port);
-        Byte[] Receive(UdpClient client, ref IPEndPoint remotEndPoint);
+        void Send(UdpClient client, Byte[] datagram, String hostname, Int32 port);
+        Byte[] Receive(UdpClient client, out IPEndPoint remoteEndPoint);
     }
 }

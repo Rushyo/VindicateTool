@@ -39,28 +39,38 @@ namespace VindicateLib
 
         public Byte[] SendRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress, IClientActioner clientActioner)
         {
+            Byte[] transactionId = GenerateTransactionId(protocol);
+            Byte[] datagram = GenerateRequest(protocol, lookupName, transactionId);
+
+            //Send datagram
+            if (protocol == Protocol.LLMNR)
+                clientActioner.Send(client, datagram, "224.0.0.252", LLMNROutboundPort);
+            else if (protocol == Protocol.NBNS)
+                clientActioner.Send(client, datagram, subnetBroadcastAddress, NBNSOutboundPort);
+            else if (protocol == Protocol.mDNS)
+                clientActioner.Send(client, datagram, "224.0.0.251", mDNSOutboundPort);
+            else
+                throw new InvalidOperationException("Unknown protocol");
+            return transactionId;
+        }
+
+        private Byte[] GenerateTransactionId(Protocol protocol)
+        {
             //Define random transaction ID where relevant
-            var transactionId = new Byte[] {0, 0};
+            var transactionId = new Byte[] { 0, 0 };
             if (protocol != Protocol.mDNS)
                 _random.NextBytes(transactionId); //TODO: Replace bad random, not that it matters too much
+            return transactionId;
+        }
 
+        private Byte[] GenerateRequest(Protocol protocol, String lookupName, Byte[] transactionId)
+        {
             //Encode NETBIOS name
             if (protocol == Protocol.NBNS)
                 lookupName = EncodeNetBiosName(lookupName, 0x20); //File server service
 
             //Create datagram
-            Byte[] datagram = CreateRequestDatagram(protocol, lookupName, transactionId);
-
-            //Send datagram
-            if (protocol == Protocol.LLMNR)
-                clientActioner.Send(client, datagram, datagram.Length, "224.0.0.252", LLMNROutboundPort);
-            else if (protocol == Protocol.NBNS)
-                clientActioner.Send(client, datagram, datagram.Length, subnetBroadcastAddress, NBNSOutboundPort);
-            else if (protocol == Protocol.mDNS)
-                clientActioner.Send(client, datagram, datagram.Length, "224.0.0.251", mDNSOutboundPort);
-            else
-                throw new InvalidOperationException("Unknown protocol");
-            return transactionId;
+            return CreateRequestDatagram(protocol, lookupName, transactionId);
         }
 
         internal SpoofDetectionResult ReceiveAndHandleReply(UdpClient client, Protocol protocol, Byte[] transactionId, IClientActioner clientActioner)
@@ -69,7 +79,7 @@ namespace VindicateLib
             Byte[] replyBuffer;
             try
             {
-                replyBuffer = clientActioner.Receive(client, ref sender);
+                replyBuffer = clientActioner.Receive(client, out sender);
             }
             catch (SocketException ex)
             {
@@ -80,30 +90,29 @@ namespace VindicateLib
                 throw;
             }
 
-            if (sender != null && replyBuffer.Length > 0)
-            {
-                var result = new SpoofDetectionResult
-                {
-                    Confidence = ConfidenceLevel.FalsePositive,
-                    Detected = false,
-                    Endpoint = null,
-                    ErrorMessage = String.Format("Unable to parse packet sent to port {0}",
-                        ((IPEndPoint) client.Client.LocalEndPoint).Port)
-                    , Protocol = Protocol.Unknown
-                };
-                try
-                {
-                    result = HandleReply(replyBuffer, sender, transactionId, protocol);
-                }
-                catch (Exception)
-                {
-                    //Omnomnom - There's all sorts of reasons the parser might crash on a packet, we need to handle all of them
-                    //until the parser is able to handle those exceptions itself
-                }
+            if (sender == null || replyBuffer.Length <= 0)
+                return null;
 
-                return result;
+            var result = new SpoofDetectionResult
+            {
+                Confidence = ConfidenceLevel.FalsePositive,
+                Detected = false,
+                Endpoint = null,
+                ErrorMessage = String.Format("Unable to parse packet sent to port {0}",
+                    ((IPEndPoint) client.Client.LocalEndPoint).Port)
+                , Protocol = Protocol.Unknown
+            };
+            try
+            {
+                result = HandleReply(replyBuffer, sender, transactionId, protocol);
             }
-            return null;
+            catch (Exception)
+            {
+                //Omnomnom - There's all sorts of reasons the parser might crash on a packet, we need to handle all of them
+                //until the parser is able to handle those exceptions itself
+            }
+
+            return result;
         }
 
         private static Byte[] CreateRequestDatagram(Protocol protocol, String lookupName, Byte[] transactionId)
