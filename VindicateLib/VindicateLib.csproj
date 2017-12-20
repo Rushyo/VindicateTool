@@ -56,7 +56,7 @@
     <Compile Include="Enums\Protocol.cs" />
     <Compile Include="SMBTester.cs" />
     <Compile Include="SpoofDetectionResult.cs" />
-    <Compile Include="UdpClientActioner.cs" />
+    <Compile Include="ClientActioner.cs" />
     <Compile Include="WPADTester.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -60,10 +60,8 @@ namespace VindicateLibTests
                 //Console.WriteLine(BitConverter.ToString(udpClientActioner.LastSendDatagram));
 
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
-                Assert.AreEqual(22, clientActioner.LastSendDatagramLength);
                 Assert.AreEqual("224.0.0.252", clientActioner.LastSendHostname);
                 Assert.AreEqual(RemoteLLMNRPort, clientActioner.LastSendPort);
-                Assert.AreEqual(clientActioner.LastSendDatagram.Length, clientActioner.LastSendDatagramLength);
             }
         }
 
@@ -84,10 +82,8 @@ namespace VindicateLibTests
                 ).ToArray();
 
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
-                Assert.AreEqual(50, clientActioner.LastSendDatagramLength);
                 Assert.AreEqual("192.168.1.255", clientActioner.LastSendHostname);
                 Assert.AreEqual(RemoteNBNSPort, clientActioner.LastSendPort);
-                Assert.AreEqual(clientActioner.LastSendDatagram.Length, clientActioner.LastSendDatagramLength);
             }
         }
 
@@ -108,10 +104,8 @@ namespace VindicateLibTests
 
                 CollectionAssert.AreEqual(new Byte[] { 0x00, 0x00}, transactionId);
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
-                Assert.AreEqual(31, clientActioner.LastSendDatagramLength);
                 Assert.AreEqual("224.0.0.251", clientActioner.LastSendHostname);
                 Assert.AreEqual(RemotemDNSPort, clientActioner.LastSendPort);
-                Assert.AreEqual(clientActioner.LastSendDatagram.Length, clientActioner.LastSendDatagramLength);
             }
         }
 

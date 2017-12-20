@@ -40,7 +40,12 @@ namespace VindicateLib
         public Byte[] SendRequest(UdpClient client, Protocol protocol, String lookupName, String subnetBroadcastAddress, IClientActioner clientActioner)
         {
             Byte[] transactionId = GenerateTransactionId(protocol);
-            Byte[] datagram = GenerateRequest(protocol, lookupName, transactionId);
+
+            //Encode NETBIOS name
+            if (protocol == Protocol.NBNS)
+                lookupName = EncodeNetBiosName(lookupName, 0x20); //File server service
+
+            Byte[] datagram = CreateRequestDatagram(protocol, lookupName, transactionId);
 
             //Send datagram
             if (protocol == Protocol.LLMNR)
@@ -61,16 +66,6 @@ namespace VindicateLib
             if (protocol != Protocol.mDNS)
                 _random.NextBytes(transactionId); //TODO: Replace bad random, not that it matters too much
             return transactionId;
-        }
-
-        private Byte[] GenerateRequest(Protocol protocol, String lookupName, Byte[] transactionId)
-        {
-            //Encode NETBIOS name
-            if (protocol == Protocol.NBNS)
-                lookupName = EncodeNetBiosName(lookupName, 0x20); //File server service
-
-            //Create datagram
-            return CreateRequestDatagram(protocol, lookupName, transactionId);
         }
 
         internal SpoofDetectionResult ReceiveAndHandleReply(UdpClient client, Protocol protocol, Byte[] transactionId, IClientActioner clientActioner)
