@@ -53,16 +53,12 @@ namespace VindicateLib
             Socket socket = null;
             try
             {
-                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                socket.ReceiveTimeout = 0;
-                socket.DontFragment = true;
-                socket.Bind(new IPEndPoint(IPAddress.Any, port));
-
-                if (protocol == Protocol.mDNS)
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
                 {
-                    socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership,
-                        new MulticastOption(IPAddress.Parse("224.0.0.251")));
-                }
+                    ReceiveTimeout = 0,
+                    DontFragment = true
+                };
+                socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
                 if (verbose)
                     logger.LogMessage(String.Format("Loaded {0} service on TCP port {1}", protocol, port), EventLogEntryType.Information, (Int32)LogEvents.LoadedTcpClient, (Int16)LogCategories.LoadingInfo);

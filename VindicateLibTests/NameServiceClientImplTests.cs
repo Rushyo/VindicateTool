@@ -60,7 +60,7 @@ namespace VindicateLibTests
                 //Console.WriteLine(BitConverter.ToString(udpClientActioner.LastSendDatagram));
 
                 CollectionAssert.AreEqual(expectedDatagram, clientActioner.LastSendDatagram);
-                Assert.AreEqual("224.0.0.252", clientActioner.LastSendHostname);
+                Assert.AreEqual("192.168.1.255", clientActioner.LastSendHostname);
                 Assert.AreEqual(RemoteLLMNRPort, clientActioner.LastSendPort);
             }
         }

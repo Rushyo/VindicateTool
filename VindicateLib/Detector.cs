@@ -102,10 +102,7 @@ namespace VindicateLib
                     if (_settings.UseLLMNR)
                         _nameServiceClient.SendRequest(_llmnrUDPClient, Protocol.LLMNR, _settings.LLMNRTarget, _localBroadcast, clientActioner);
                     if (_settings.UseNBNS)
-                    {
                         _nameServiceClient.SendRequest(_nbnsUDPClient, Protocol.NBNS, _settings.NBNSTarget, _localBroadcast, clientActioner);
-
-                    }
                     if (_settings.UsemDNS)
                         _nameServiceClient.SendRequest(_mdnsUDPClient, Protocol.mDNS, _settings.mDNSTarget, null, clientActioner);
 
