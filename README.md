@@ -97,18 +97,18 @@ Requires .NET Framework 4.5.2 and Visual Studio 2015 or higher to build. Pre-com
 
 Inbound:
 
-UDP Local 49501 <- Remote 5355 (LLMNR)
-UDP Local 49502 <- Remote 137 (NBNS)
-UDP Local 5353 <- Remote 5353 (mDNS)
+* UDP Local 49501 <- Remote 5355 (LLMNR)
+* UDP Local 49502 <- Remote 137 (NBNS)
+* UDP Local 5353 <- Remote 5353 (mDNS)
 
 Outbound:
 
-UDP Local 49501 -> Remote 5355 (LLMNR)
-UDP Local 49502 -> Remote 137 (NBNS)
-UDP Local 5353 -> Remote 5353 (mDNS)
-TCP Local 49152-65535* -> Remote 80 (WPAD)
-TCP Local 49152-65535* -> Remote 443 (WPAD)
-TCP Local 49152-65535* -> Remote 139 (SMB)
+* UDP Local 49501 -> Remote 5355 (LLMNR)
+* UDP Local 49502 -> Remote 137 (NBNS)
+* UDP Local 5353 -> Remote 5353 (mDNS)
+* TCP Local 49152-65535* -> Remote 80 (WPAD)
+* TCP Local 49152-65535* -> Remote 443 (WPAD)
+* TCP Local 49152-65535* -> Remote 139 (SMB)
 
 *Ephemeral ports. Given values assume Windows Vista+
 
