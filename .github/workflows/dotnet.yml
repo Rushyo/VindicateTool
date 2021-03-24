@@ -21,10 +21,10 @@ jobs:
       uses: nuget/setup-nuget@v1
     - name: Restore dependencies (.NET)
       run: dotnet restore
-    - name: Install test framework for library tests
-      run: dotnet add VindicateLibTests/VindicateLibTests.csproj package MSTest.TestFramework
     - name: Restore dependencies (NuGet)
       run: nuget restore
+    - name: Install test framework for library tests
+      run: nuget install MSTest.TestFramework
     - name: Build
       run: dotnet build --no-restore
     - name: Test
