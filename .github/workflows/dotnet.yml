@@ -24,7 +24,7 @@ jobs:
     - name: Restore dependencies (NuGet)
       run: nuget restore
     - name: Install test framework for library tests
-      run: nuget install MSTest.TestFramework
+      run: nuget install Microsoft.VisualStudio.QualityTools.UnitTestFramework
     - name: Build
       run: dotnet build --no-restore
     - name: Test
