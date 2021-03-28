@@ -1,7 +1,7 @@
 # Vindicate
 
 ![Supported](https://img.shields.io/badge/supported-yes%20(2021)-brightgreen)
-[![GitHub stars](https://img.shields.io/github/stars/Rushyo/VindicateTool.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/Rushyo/complexkspinstaller/stargazers/)
+[![GitHub stars](https://img.shields.io/github/stars/Rushyo/VindicateTool.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/Rushyo/VindicateTool/stargazers/)
 
 An LLMNR/NBNS/mDNS Spoofing Detection Toolkit for network administrators
 
